@@ -133,3 +133,26 @@ CREATE POLICY "Users can access gap analysis for their projects"
       AND public.projects.user_id = auth.uid()
     )
   );
+
+-- 6. AUDIT LEADS TABLE (GEO Studio Funnel: Name, Email, WhatsApp)
+CREATE TABLE IF NOT EXISTS public.audit_leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  domain TEXT NOT NULL,
+  overall_score INT DEFAULT 0,
+  email_sent BOOLEAN DEFAULT false,
+  whatsapp_sent BOOLEAN DEFAULT false,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS for Audit Leads (Allow insert from public lead capture, read by admin)
+ALTER TABLE public.audit_leads ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public insert of audit leads"
+  ON public.audit_leads
+  FOR INSERT
+  WITH CHECK (true);
+

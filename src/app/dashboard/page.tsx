@@ -20,11 +20,13 @@ import { AiRadarSweep } from '@/components/dashboard/ai-radar-sweep';
 import { AuditChecklistView } from '@/components/dashboard/audit-checklist-view';
 import { SdkInstallModal } from '@/components/dashboard/sdk-install-modal';
 import { PrintableExecutiveReport } from '@/components/dashboard/printable-executive-report';
+import { LeadCaptureModal } from '@/components/dashboard/lead-capture-modal';
+import { LeadDeliveryBadge } from '@/components/dashboard/lead-delivery-badge';
 import {
   Brain, RefreshCw, LogOut, Globe, Sparkles, CheckCircle2,
   Search, Loader2, Sun, Moon, Layers, Target, Link2, Bot,
   TrendingUp, Building2, Cpu, Tag, Key, Zap, ExternalLink, Flame, X,
-  Radar, ShieldCheck, Code, HelpCircle
+  Radar, ShieldCheck, Code, HelpCircle, MessageCircle, Mail
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -37,6 +39,14 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isSdkModalOpen, setIsSdkModalOpen] = useState(false);
+
+  // GEO Studio Lead Capture & Delivery State
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const [leadName, setLeadName] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [whatsappDeliveryUrl, setWhatsappDeliveryUrl] = useState('');
+  const [whatsappDeliveryText, setWhatsappDeliveryText] = useState('');
 
   // Analysis Inputs (Website URL + Optional Brand Name + Custom Prompt Count)
   const [targetDomainInput, setTargetDomainInput] = useState('');
@@ -56,7 +66,7 @@ export default function DashboardPage() {
       }
     });
 
-    // Load cached audit from localStorage if available
+    // Load cached audit and saved lead details from localStorage/sessionStorage
     if (typeof window !== 'undefined') {
       try {
         const cached = localStorage.getItem('tangentcore_last_audit');
@@ -67,6 +77,12 @@ export default function DashboardPage() {
             setAnalyzedProjects([parsed]);
           }
         }
+        const savedName = sessionStorage.getItem('pendingLeadName') || localStorage.getItem('tangentcore_lead_name') || '';
+        const savedEmail = sessionStorage.getItem('pendingLeadEmail') || localStorage.getItem('tangentcore_lead_email') || '';
+        const savedPhone = sessionStorage.getItem('pendingLeadPhone') || localStorage.getItem('tangentcore_lead_phone') || '';
+        if (savedName) setLeadName(savedName);
+        if (savedEmail) setLeadEmail(savedEmail);
+        if (savedPhone) setLeadPhone(savedPhone);
       } catch {
         // ignore
       }
@@ -75,12 +91,33 @@ export default function DashboardPage() {
       if (pending) {
         sessionStorage.removeItem('pendingScanUrl');
         setTargetDomainInput(pending);
-        handleRunAnalysisForDomain(pending);
+        const lName = sessionStorage.getItem('pendingLeadName') || '';
+        const lEmail = sessionStorage.getItem('pendingLeadEmail') || '';
+        const lPhone = sessionStorage.getItem('pendingLeadPhone') || '';
+        const sEmail = sessionStorage.getItem('pendingSendEmail') !== '0';
+        const sWhatsapp = sessionStorage.getItem('pendingSendWhatsapp') !== '0';
+        handleRunAnalysisForDomain(pending, '', {
+          name: lName,
+          email: lEmail,
+          phone: lPhone,
+          sendEmail: sEmail,
+          sendWhatsapp: sWhatsapp,
+        });
       }
     }
   }, []);
 
-  const handleRunAnalysisForDomain = async (domainToScan: string, brandToScan: string = '') => {
+  const handleRunAnalysisForDomain = async (
+    domainToScan: string,
+    brandToScan: string = '',
+    leadInfo?: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      sendEmail?: boolean;
+      sendWhatsapp?: boolean;
+    }
+  ) => {
     try {
       setLoading(true);
       const res = await fetch('/api/analyze', {
@@ -111,11 +148,40 @@ export default function DashboardPage() {
       toast.success(`Complete AI & Technical Audit finished for ${data.domain}!`);
       setActiveTab('overview');
 
-      setActiveAuditData(data);
-      setAnalyzedProjects((prev) => {
-        const filtered = prev.filter(p => p.domain !== data.domain);
-        return [data, ...filtered];
-      });
+      // Dispatch audit report to user's Email & WhatsApp (GEO Studio Funnel)
+      const currentEmail = leadInfo?.email || leadEmail;
+      const currentPhone = leadInfo?.phone || leadPhone;
+      const currentName = leadInfo?.name || leadName || 'Valued Brand';
+
+      if (currentEmail || currentPhone) {
+        try {
+          const capRes = await fetch('/api/leads/capture', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: currentName,
+              email: currentEmail,
+              phone: currentPhone,
+              domain: data.domain,
+              score: data.compositeGeoScore || data.pageAudit?.studioScore || 50,
+              grade: data.grade || 'C',
+              pageAudit: data.pageAudit,
+              sendEmail: leadInfo?.sendEmail ?? true,
+              sendWhatsapp: leadInfo?.sendWhatsapp ?? true,
+            }),
+          });
+          if (capRes.ok) {
+            const capData = await capRes.json();
+            if (capData.whatsappUrl) {
+              setWhatsappDeliveryUrl(capData.whatsappUrl);
+              setWhatsappDeliveryText(capData.whatsappText);
+            }
+            toast.success('Executive audit delivered to your inbox and WhatsApp!');
+          }
+        } catch (leadErr) {
+          console.warn('Lead dispatch error:', leadErr);
+        }
+      }
 
       // Reset domain/brand inputs
       setTargetDomainInput('');
@@ -127,13 +193,41 @@ export default function DashboardPage() {
     }
   };
 
+  const handleLeadSubmitFromDashboard = (leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    sendEmail: boolean;
+    sendWhatsapp: boolean;
+  }) => {
+    setLeadName(leadData.name);
+    setLeadEmail(leadData.email);
+    setLeadPhone(leadData.phone);
+    try {
+      localStorage.setItem('tangentcore_lead_name', leadData.name);
+      localStorage.setItem('tangentcore_lead_email', leadData.email);
+      localStorage.setItem('tangentcore_lead_phone', leadData.phone);
+    } catch {}
+    setIsLeadModalOpen(false);
+    handleRunAnalysisForDomain(targetDomainInput, targetBrandInput, leadData);
+  };
+
   const handleRunAnalysis = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!targetDomainInput) {
       toast.error('Please enter a website domain (e.g. stripe.com)');
       return;
     }
-    await handleRunAnalysisForDomain(targetDomainInput, targetBrandInput);
+    // If user has not yet entered their details for this session, pop up the GEO Studio modal
+    if (!leadEmail && !leadPhone) {
+      setIsLeadModalOpen(true);
+      return;
+    }
+    await handleRunAnalysisForDomain(targetDomainInput, targetBrandInput, {
+      name: leadName,
+      email: leadEmail,
+      phone: leadPhone,
+    });
   };
 
   const handleLogout = async () => {
@@ -148,7 +242,12 @@ export default function DashboardPage() {
 
       {/* Full-Screen Analysis Animation Overlay */}
       {loading && (
-        <AnalysisAnimation domain={targetDomainInput || 'website'} isDark={isDark} />
+        <AnalysisAnimation
+          domain={targetDomainInput || activeAuditData?.domain || 'website'}
+          isDark={isDark}
+          leadEmail={leadEmail}
+          leadPhone={leadPhone}
+        />
       )}
 
       {/* Top Header Navbar */}
@@ -408,7 +507,24 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <button
+                    onClick={() => {
+                      if (whatsappDeliveryUrl) {
+                        window.open(whatsappDeliveryUrl, '_blank');
+                      } else {
+                        const clean = (leadPhone || '').replace(/[^0-9]/g, '');
+                        const txt = encodeURIComponent(`Hi, here is the TangentCore GEO Audit Report for ${activeAuditData.domain}: https://www.tangentcore.in/dashboard?domain=${activeAuditData.domain}`);
+                        window.open(`https://api.whatsapp.com/send?phone=${clean}&text=${txt}`, '_blank');
+                      }
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] text-white text-xs font-bold hover:bg-[#20ba59] transition-all shadow-md shadow-emerald-500/20"
+                    title="Send or Open in WhatsApp"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-white stroke-none" />
+                    <span>WhatsApp</span>
+                  </button>
+
                   <button
                     onClick={() => setIsSdkModalOpen(true)}
                     className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-lime-400 text-neutral-950 text-xs font-bold uppercase tracking-wider hover:bg-lime-300 transition-all shadow-[0_0_15px_rgba(216,243,28,0.2)]"
@@ -801,8 +917,27 @@ export default function DashboardPage() {
 
             {/* DEDICATED MULTI-PAGE EXECUTIVE PRINT REPORT (GEO STUDIO PARITY) */}
             <PrintableExecutiveReport auditData={activeAuditData} />
+
+            {/* GEO Studio Parity: Delivery Status Badge (Bottom Right) */}
+            <LeadDeliveryBadge
+              email={leadEmail}
+              phone={leadPhone}
+              whatsappUrl={whatsappDeliveryUrl}
+              whatsappText={whatsappDeliveryText}
+              domain={activeAuditData.domain}
+              isDark={isDark}
+            />
           </>
         )}
+
+        {/* GEO Studio Lead Capture Modal */}
+        <LeadCaptureModal
+          isOpen={isLeadModalOpen}
+          domain={targetDomainInput || 'your website'}
+          onClose={() => setIsLeadModalOpen(false)}
+          onSubmit={handleLeadSubmitFromDashboard}
+          isDark={isDark}
+        />
 
         <SdkInstallModal
           isOpen={isSdkModalOpen}

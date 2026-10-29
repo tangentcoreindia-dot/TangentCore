@@ -17,10 +17,13 @@ import { ScrollReveal, StaggerContainer, StaggerItem } from '@/components/ui/scr
 import { useTheme } from '@/components/theme-provider';
 import { Navbar } from '@/components/navbar';
 import { BrandLogo } from '@/components/ui/brand-logo';
+import { LeadCaptureModal } from '@/components/dashboard/lead-capture-modal';
 
 export default function HomePage() {
   const { isDark, setIsDark } = useTheme();
   const [searchUrl, setSearchUrl] = useState('');
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const [pendingDomain, setPendingDomain] = useState('');
   const [activeIndustryTab, setActiveIndustryTab] = useState(0);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const router = useRouter();
@@ -29,11 +32,28 @@ export default function HomePage() {
     e.preventDefault();
     if (searchUrl) {
       const clean = searchUrl.trim().toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('pendingScanUrl', clean);
-      }
-      router.push('/dashboard');
+      setPendingDomain(clean);
+      setIsLeadModalOpen(true);
     }
+  };
+
+  const handleLeadSubmit = (leadData: {
+    name: string;
+    email: string;
+    phone: string;
+    sendEmail: boolean;
+    sendWhatsapp: boolean;
+  }) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('pendingScanUrl', pendingDomain);
+      sessionStorage.setItem('pendingLeadName', leadData.name);
+      sessionStorage.setItem('pendingLeadEmail', leadData.email);
+      sessionStorage.setItem('pendingLeadPhone', leadData.phone);
+      sessionStorage.setItem('pendingSendEmail', leadData.sendEmail ? '1' : '0');
+      sessionStorage.setItem('pendingSendWhatsapp', leadData.sendWhatsapp ? '1' : '0');
+    }
+    setIsLeadModalOpen(false);
+    router.push('/dashboard');
   };
 
   const industries = [
@@ -987,6 +1007,15 @@ export default function HomePage() {
 
       {/* Luxury Footer */}
       <Footer isDark={isDark} />
+
+      {/* GEO Studio Lead Capture Modal */}
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        domain={pendingDomain}
+        onClose={() => setIsLeadModalOpen(false)}
+        onSubmit={handleLeadSubmit}
+        isDark={isDark}
+      />
     </div>
   );
 }

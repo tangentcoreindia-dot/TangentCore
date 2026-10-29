@@ -6,6 +6,8 @@ import { Brain, Globe, Cpu, Sparkles, Zap, Radio, Eye, Layers, Shield, Search } 
 interface AnalysisAnimationProps {
   domain: string;
   isDark: boolean;
+  leadEmail?: string;
+  leadPhone?: string;
 }
 
 const AI_MODELS = [
@@ -26,7 +28,7 @@ const SCAN_PHASES = [
   { label: 'Computing AEO/GEO Scores', icon: Shield, detail: 'Aggregating multi-model results into final scores...' },
 ];
 
-export function AnalysisAnimation({ domain, isDark }: AnalysisAnimationProps) {
+export function AnalysisAnimation({ domain, isDark, leadEmail, leadPhone }: AnalysisAnimationProps) {
   const [currentPhase, setCurrentPhase] = useState(0);
   const [progress, setProgress] = useState(0);
   const [pulseCount, setPulseCount] = useState(0);
@@ -381,16 +383,50 @@ export function AnalysisAnimation({ domain, isDark }: AnalysisAnimationProps) {
           })}
         </div>
 
-        {/* === SCANNING TEXT ANIMATION === */}
-        <div className={`mt-6 flex items-center gap-2 text-xs font-semibold ${
-          isDark ? 'text-slate-500' : 'text-slate-400'
+        {/* === GEO STUDIO PARITY: DELIVERY REASSURANCE CARD === */}
+        <div className={`mt-6 w-full max-w-md p-4 rounded-2xl border text-center transition-all ${
+          isDark
+            ? 'bg-[#121217]/90 border-[#2A2A38] text-white shadow-2xl'
+            : 'bg-white border-slate-200 text-slate-900 shadow-lg'
         }`}>
-          <div className="flex gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="flex items-center justify-center gap-3 mb-2">
+            {/* Dual Icons: Gmail & WhatsApp */}
+            <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shadow-md p-1.5 transform hover:scale-110 transition-transform">
+              <svg viewBox="0 0 24 24" className="w-6 h-6">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-[#25D366] flex items-center justify-center shadow-md p-1.5 transform hover:scale-110 transition-transform">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.82 2.791.82 3.182 0 5.768-2.587 5.768-5.766.001-3.181-2.585-5.806-5.768-5.806zm3.385 8.213c-.144.405-.837.774-1.17.824-.312.045-.694.077-1.127-.062-.26-.084-.592-.206-1.019-.391-1.794-.775-2.96-2.6-3.05-2.72-.09-.12-.733-.974-.733-1.859 0-.884.463-1.32.628-1.499.165-.18.359-.225.48-.225.12 0 .24.002.345.007.111.006.26-.042.406.31.15.361.51 1.246.555 1.337.045.09.075.195.015.315-.06.12-.09.195-.18.3-.09.105-.19.234-.27.315-.09.09-.184.187-.079.367.105.18.468.772 1.004 1.25.688.614 1.27.804 1.45.894.18.09.285.075.39-.045.105-.12.45-.525.57-.705.12-.18.24-.15.405-.09.165.06 1.05.495 1.23.585.18.09.3.135.345.21.045.075.045.435-.099.84z"/>
+              </svg>
+            </div>
           </div>
-          <span>This may take 30-60 seconds for a comprehensive audit</span>
+
+          <h3 className="text-sm font-bold text-white mb-1">
+            Your report is on its way to your inbox & WhatsApp
+          </h3>
+          <p className="text-xs text-slate-400">
+            Usually takes 1–3 minutes. You can leave, the report will be here when you come back.
+          </p>
+
+          {(leadEmail || leadPhone) && (
+            <div className="mt-2.5 flex items-center justify-center gap-2 flex-wrap text-[11px]">
+              {leadEmail && (
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  ✉️ {leadEmail}
+                </span>
+              )}
+              {leadPhone && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  💬 {leadPhone}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
