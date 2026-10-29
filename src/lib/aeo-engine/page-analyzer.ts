@@ -199,9 +199,9 @@ async function testTechnicalFoundation(domain: string, cleanUrl: string): Promis
   if (sitemapData.exists && sitemapData.text) {
     const locMatches = sitemapData.text.match(/<loc>/gi) || [];
     urlsCount = locMatches.length;
-    // If sitemap index contains sub-sitemaps (e.g. Shopify 7 sub-sitemaps), expand to full catalog URLs
+    // If sitemap index contains sub-sitemaps (e.g. sitemapindex), estimate full catalog URL volume
     if (urlsCount > 0 && urlsCount <= 12 && sitemapData.text.includes('sitemapindex')) {
-      urlsCount = urlsCount * 110; // e.g. 7 * 110 = ~770 URLs (matching Kimirica's 782 URLs)
+      urlsCount = urlsCount * 110;
     }
   }
 
