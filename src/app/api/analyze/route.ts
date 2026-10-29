@@ -53,10 +53,8 @@ export async function POST(req: Request) {
     const mentionedPrompts = promptScans.filter(s => s.shareOfVoice > 0).length;
     const overallShareOfVoice = totalPrompts > 0 ? Math.round((mentionedPrompts / totalPrompts) * 100) : 0;
 
-    // Composite Overall GEO Score formula (AI SoV 40% + Schema 25% + Entity 20% + Readability 15%)
-    const compositeGeoScore = totalPrompts > 0
-      ? Math.round((overallShareOfVoice * 0.40) + (pageAudit.schemaScore * 0.25) + (pageAudit.entityScore * 0.20) + (pageAudit.readabilityScore * 0.15))
-      : pageAudit.overallGeoScore;
+    // Align Overall Score directly to GEO Studio's 7-Category Health formula
+    const compositeGeoScore = pageAudit.studioScore || pageAudit.overallGeoScore;
 
     const scanCost = getScanUsage();
 

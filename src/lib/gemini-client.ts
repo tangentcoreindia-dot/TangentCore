@@ -16,7 +16,7 @@ const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 const DEFAULT_BEDROCK_REGION = process.env.BEDROCK_REGION || process.env.AWS_REGION || 'ap-south-1';
-const DEFAULT_BEDROCK_MODEL = process.env.BEDROCK_DEFAULT_MODEL || 'apac.amazon.nova-pro-v1:0';
+const DEFAULT_BEDROCK_MODEL = process.env.BEDROCK_DEFAULT_MODEL || 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
 
 export interface AIOptions {
   model?: string;
@@ -201,8 +201,11 @@ export async function queryBedrock(
           console.warn(`[Bedrock Failover] Claude unavailable. Failing over to Amazon Nova Pro...`);
           return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.amazon.nova-pro-v1:0' });
         } else if (modelId.includes('llama')) {
-          console.warn(`[Bedrock Failover] Llama not enabled in ${region}. Failing over to Amazon Nova Lite...`);
-          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.amazon.nova-lite-v1:0' });
+          console.warn(`[Bedrock Failover] Llama model unavailable in ${region}. Failing over to Claude 3.5 Sonnet v2...`);
+          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0' });
+        } else if (!modelId.includes('claude-3-5')) {
+          console.warn(`[Bedrock Failover] Model ${modelId} failed. Failing over to Claude 3.5 Sonnet v2...`);
+          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0' });
         }
       }
     }

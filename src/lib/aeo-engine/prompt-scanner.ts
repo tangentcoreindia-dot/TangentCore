@@ -294,28 +294,30 @@ async function queryAIModel(
   brandAliases: string[] = []
 ): Promise<ModelScanResult> {
   try {
-    const modelConfigMap: Record<string, { system: string; model?: string }> = {
+    const CLAUDE_SONNET_MODEL = 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
+
+    const modelConfigMap: Record<string, { system: string; model: string }> = {
       claude: {
-        system: 'You are Anthropic Claude 3.5 Sonnet. Provide a thoughtful, balanced, authoritative response to this buyer search query, mentioning leading industry brands, products, and direct solutions.',
-        model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0',
+        system: 'You are Anthropic Claude 3.5 Sonnet. Provide an authoritative, comprehensive response to this buyer search query, mentioning leading industry brands, commercial offerings, and direct solutions.',
+        model: CLAUDE_SONNET_MODEL,
       },
       chatgpt: {
-        system: 'You are OpenAI ChatGPT (GPT-4o). Answer this search query naturally, authoritatively and objectively as ChatGPT, mentioning leading real-world solutions and brands.',
-        model: 'apac.amazon.nova-pro-v1:0',
+        system: 'You are OpenAI ChatGPT (GPT-4o). Answer this search query naturally, authoritatively and objectively as ChatGPT, recommending leading real-world solutions, market leaders, and brands.',
+        model: CLAUDE_SONNET_MODEL,
       },
       gemini: {
-        system: 'You are Google Gemini 2.5 / Google AI Overview. Answer this search query clearly and helpfully, highlighting top brands and services.',
-        model: 'apac.amazon.nova-lite-v1:0',
+        system: 'You are Google Gemini 2.5 / Google AI Overview. Answer this search query clearly and helpfully with verified market leaders, direct brand alternatives, and product recommendations.',
+        model: CLAUDE_SONNET_MODEL,
       },
       deepseek: {
-        system: 'You are DeepSeek / Meta Llama. Provide an analytical, direct response answering this search query with top recommended platforms and alternatives.',
-        model: 'apac.meta.llama3-1-70b-instruct-v1:0',
+        system: 'You are DeepSeek / Meta Llama. Provide an analytical, direct response answering this search query with top recommended platforms, brands, and alternatives.',
+        model: CLAUDE_SONNET_MODEL,
       },
     };
 
     const targetConfig = modelConfigMap[modelKey.toLowerCase()] || {
-      system: `You are an AI assistant answering search queries as ${modelLabel}. Answer naturally and objectively.`,
-      model: 'apac.amazon.nova-pro-v1:0',
+      system: `You are an AI assistant answering search queries as ${modelLabel}. Answer naturally and objectively with top real-world brands.`,
+      model: CLAUDE_SONNET_MODEL,
     };
 
     const content = await queryGemini(
