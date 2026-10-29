@@ -50,7 +50,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
     { name: 'deepseek', label: 'DeepSeek V3', color: 'text-cyan-700', bg: 'bg-cyan-50 border-cyan-200' },
   ];
 
-  const engineStats = targetEngines.map(eng => {
+  const engineStats = targetEngines.map((eng: any) => {
     let mentionedCount = 0;
     promptScans.forEach((p: any) => {
       const match = p.modelResults?.find((m: any) => m.modelName?.toLowerCase().includes(eng.name));
@@ -62,13 +62,13 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
 
   // Keywords
   const extractedKeywords = pageAudit.autoDiscoveredKeywords || auditData.autoDiscoveredKeywords || [];
-  const baseKeywords = (extractedKeywords.length > 0 ? extractedKeywords : [
+  const baseKeywords = ((extractedKeywords && extractedKeywords.length > 0 ? extractedKeywords : [
     'AEO & GEO Optimization',
     'AI Search Engine Visibility',
     'JSON-LD Schema Markup',
     'LLM Citation Analytics',
     'ChatGPT Brand Rankings',
-  ]).slice(0, 8).map((kw: string, idx: number) => ({
+  ]) as string[]).slice(0, 8).map((kw: any, idx: number) => ({
     keyword: kw,
     intent: idx % 2 === 0 ? 'Commercial' : 'Informational',
     searchVolume: `${(idx + 1) * 2}k - ${(idx + 2) * 5}k / mo`,
@@ -238,7 +238,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
               Score by Category (Signal Health & Issue Penalties)
             </h2>
             <div className="space-y-2">
-              {categoryScores.map((cat, idx) => (
+              {categoryScores.map((cat: any, idx: number) => (
                 <div key={idx} className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-700 w-44">{cat.name}</span>
                   <div className="flex-1 mx-4 bg-slate-200 rounded-full h-2.5 overflow-hidden">
@@ -329,7 +329,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
 
           {/* Model Stats Cards */}
           <div className="grid grid-cols-4 gap-3 mb-6">
-            {engineStats.map((eng, idx) => (
+            {engineStats.map((eng: any, idx: number) => (
               <div key={idx} className={`p-4 rounded-xl border ${eng.bg}`}>
                 <div className="text-[10px] font-black uppercase text-slate-600">{eng.label}</div>
                 <div className={`text-2xl font-black mt-1 ${eng.color}`}>
@@ -637,7 +637,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {baseKeywords.map((kw, kIdx) => (
+              {baseKeywords.map((kw: any, kIdx: number) => (
                 <tr key={kIdx} className="font-medium">
                   <td className="py-2.5 px-3 font-bold text-slate-900">{kw.keyword}</td>
                   <td className="py-2.5 px-3">
