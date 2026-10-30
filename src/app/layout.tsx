@@ -5,7 +5,13 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'TangentCore — Multi-Model AI Search Optimization & GEO Platform',
-  description: 'Analyze, audit, and optimize website Answer Engine Optimization (AEO) and Generative Engine Optimization (GEO) across ChatGPT, Gemini, Claude & Perplexity at tangentcore.in.',
+  description: 'TangentCore is a Scalezix Venture entity and an enterprise AI Search Optimization & GEO platform under scalezix.com. Analyze, audit, and optimize website Answer Engine Optimization (AEO) and Generative Engine Optimization (GEO) across ChatGPT, Gemini, Claude & Perplexity at tangentcore.in.',
+  verification: {
+    google: [
+      '1Pi90OpG7fMdyDpdXEsy8htYND4h-eWxgBoSqJsbqhY',
+      'b2foknT-us0J8fiUh-Ts70-AFMa-z9--AaQ8fXKvc4I',
+    ],
+  },
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',

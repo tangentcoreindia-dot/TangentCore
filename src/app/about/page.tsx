@@ -48,7 +48,7 @@ export default function AboutPage() {
             isDark ? 'bg-[#121315] border-white/10 text-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#B87333]'
           } shadow-sm`}>
             <Building2 className="w-3.5 h-3.5 text-[#C7A15A]" />
-            <span className="uppercase tracking-wider">ABOUT TANGENTCORE</span>
+            <span className="uppercase tracking-wider">A SCALEZIX VENTURE ENTITY • TANGENTCORE</span>
           </div>
 
           <h1 className={`text-4xl sm:text-6xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#181818]'}`}>
@@ -56,11 +56,20 @@ export default function AboutPage() {
           </h1>
 
           <p className={`text-lg sm:text-xl leading-relaxed ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-            As search evolves from traditional search engines to AI-powered conversations, businesses face a new challenge: ensuring their brand is recognised, understood, and recommended by AI.
+            TangentCore is a Scalezix Venture entity and a flagship AI visibility & GEO product under{' '}
+            <a
+              href="https://scalezix.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#C7A15A] underline hover:text-white transition-colors font-semibold"
+            >
+              scalezix.com
+            </a>
+            . As search evolves from traditional search engines to AI-powered conversations, businesses face a new challenge: ensuring their brand is recognised, understood, and recommended by AI.
           </p>
 
           <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-[#B7B7B5]/80' : 'text-[#5C5C5C]/80'} max-w-3xl mx-auto`}>
-            TangentCore was built to solve this challenge. We help organisations monitor, measure, and improve their visibility across AI-powered search platforms, providing the intelligence needed to succeed in an increasingly conversational web.
+            Tangent was built to solve this challenge. We help organisations monitor, measure, and improve their visibility across AI-powered search platforms, providing the intelligence needed to succeed in an increasingly conversational web.
           </p>
         </div>
 

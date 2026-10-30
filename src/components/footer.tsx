@@ -42,9 +42,9 @@ export function Footer({ isDark = true }: FooterProps) {
     { label: 'About', href: '/about' },
     { label: 'Careers', href: '/careers' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Scalezix.com ↗', href: 'https://scalezix.com' },
     { label: 'Partners', href: '/partners' },
     { label: 'Press Kit', href: '/press-kit' },
-    { label: 'Brand Assets', href: '/brand-assets' },
   ];
 
   const legalLinks = [
@@ -74,14 +74,29 @@ export function Footer({ isDark = true }: FooterProps) {
             {/* Brand Logo & Venture Badge */}
             <div className="space-y-3">
               <BrandLogo isDark={isDark || true} size="lg" subtitle="AI VISIBILITY INTELLIGENCE" />
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A15A]/10 border border-[#C7A15A]/30 text-xs font-mono font-bold text-[#C7A15A]">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>A Scalezix Venture</span>
-              </div>
+              <a
+                href="https://scalezix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C7A15A]/10 border border-[#C7A15A]/30 text-xs font-mono font-bold text-[#C7A15A] hover:bg-[#C7A15A]/20 transition-all cursor-pointer group"
+                title="A Scalezix Venture Entity - scalezix.com"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#C7A15A] group-hover:rotate-12 transition-transform" />
+                <span>A Scalezix Venture Entity • scalezix.com</span>
+              </a>
             </div>
             
             <p className={`text-sm ${isDark ? 'text-[#B7B7B5]' : 'text-[#A0A0A5]'} leading-relaxed max-w-sm`}>
-              Enterprise AI Visibility Intelligence for monitoring, analysing, and optimising how your brand is discovered across AI-powered search and answer engines.
+              Enterprise AI Visibility Intelligence platform by Scalezix Ventures. Tangent is a product under{' '}
+              <a
+                href="https://scalezix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#C7A15A] font-semibold underline hover:text-white transition-colors"
+              >
+                scalezix.com
+              </a>{' '}
+              built for monitoring, analysing, and optimising brand discovery across AI search engines.
             </p>
 
             {/* Newsletter Inline Subscription Box */}
@@ -210,7 +225,17 @@ export function Footer({ isDark = true }: FooterProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <Sparkles className="w-4 h-4 text-[#C7A15A]" />
             <span>© 2025 TangentCore. All rights reserved.</span>
-            <span className="text-[#C7A15A] font-semibold">• A Scalezix Venture</span>
+            <span className="text-[#C7A15A] font-semibold">
+              • A Scalezix Venture Entity | A product under{' '}
+              <a
+                href="https://scalezix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-white transition-colors"
+              >
+                scalezix.com
+              </a>
+            </span>
           </div>
           
           <div className="flex items-center gap-2">
