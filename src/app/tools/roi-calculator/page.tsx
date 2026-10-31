@@ -11,6 +11,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AiBackground } from '@/components/ui/ai-background';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
+import { ToolLandingWrapper } from '@/components/tools/tool-landing-wrapper';
 
 export default function RoiCalculatorToolPage() {
   const { isDark } = useTheme();
@@ -39,29 +40,9 @@ export default function RoiCalculatorToolPage() {
       <AiBackground isDark={isDark} />
       <Navbar ctaText="Audit Your Brand" ctaHref="/dashboard" />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10 space-y-12">
-        
-        {/* Page Title Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className={`inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-xs font-mono font-bold ${
-            isDark ? 'bg-[#121315] border-white/10 text-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#B87333]'
-          } shadow-sm`}>
-            <Calculator className="w-3.5 h-3.5 text-[#C7A15A]" />
-            <span className="uppercase tracking-wider">Free Micro-Tool #02</span>
-          </div>
-
-          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight ${
-            isDark ? 'text-[#F6F6F4]' : 'text-[#181818]'
-          }`}>
-            AI Search ROI Calculator
-          </h1>
-
-          <p className={`text-base sm:text-lg leading-relaxed ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-            Calculate your estimated revenue growth, new buyer conversions, and return on investment from optimizing citations across ChatGPT, Perplexity, and Gemini.
-          </p>
-        </div>
-
-        {/* Calculator Main Grid: Left Sliders Inputs / Right Instant Results */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10">
+        <ToolLandingWrapper toolId="roi-calculator">
+          {/* Calculator Main Grid: Left Sliders Inputs / Right Instant Results */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Interactive Sliders & Inputs (lg:col-span-7) */}
@@ -69,7 +50,9 @@ export default function RoiCalculatorToolPage() {
             isDark ? 'bg-[#121315]/90 border-white/10' : 'bg-white border-[#E5E3DF]'
           } p-6 sm:p-8 space-y-8 shadow-2xl backdrop-blur-md`}>
             
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className={`flex items-center justify-between border-b pb-4 ${
+              isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+            }`}>
               <h2 className={`text-xl font-extrabold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#181818]'}`}>
                 <BarChart3 className="w-5 h-5 text-[#C7A15A]" />
                 <span>Adjust Your Brand Parameters</span>
@@ -320,7 +303,7 @@ export default function RoiCalculatorToolPage() {
           </div>
 
         </div>
-
+        </ToolLandingWrapper>
       </main>
 
       <Footer isDark={isDark} />

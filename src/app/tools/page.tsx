@@ -176,7 +176,7 @@ export default function ToolsHubPage() {
           </h1>
 
           <p className={`text-base sm:text-lg leading-relaxed ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-            Explore our suite of 12 free intelligence utilities designed to analyze brand logos, executive summaries, market competitors, LLM search readiness, and ROI.
+            Explore our suite of 12 free intelligence utilities. Click any tool to view its dedicated landing page, complete capabilities guide, and live interactive studio.
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export default function ToolsHubPage() {
                     href={tool.href}
                     className="w-full py-3 px-4 rounded-2xl luxury-btn-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] transition-transform"
                   >
-                    <span>Launch Free Tool</span>
+                    <span>Explore</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>

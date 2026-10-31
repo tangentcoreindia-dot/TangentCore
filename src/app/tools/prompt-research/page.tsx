@@ -11,6 +11,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AiBackground } from '@/components/ui/ai-background';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
+import { ToolLandingWrapper } from '@/components/tools/tool-landing-wrapper';
 
 export default function PromptResearchPage() {
   const { isDark } = useTheme();
@@ -57,27 +58,9 @@ export default function PromptResearchPage() {
       <AiBackground isDark={isDark} />
       <Navbar ctaText="Audit Your Brand" ctaHref="/dashboard" />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10 space-y-12">
-        
-        {/* Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className={`inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-xs font-mono font-bold ${
-            isDark ? 'bg-[#121315] border-white/10 text-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#B87333]'
-          } shadow-sm`}>
-            <Search className="w-3.5 h-3.5 text-[#C7A15A]" />
-            <span className="uppercase tracking-wider">Free Micro-Tool #10</span>
-          </div>
-
-          <h1 className={`text-4xl sm:text-5xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#181818]'}`}>
-            Buyer Intent Prompt Discovery Engine
-          </h1>
-
-          <p className={`text-base sm:text-lg leading-relaxed ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-            Uncover the exact conversational prompts real buyers ask ChatGPT, Perplexity, and Claude in your vertical.
-          </p>
-        </div>
-
-        {/* Form & Results Grid */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10">
+        <ToolLandingWrapper toolId="prompt-research">
+          {/* Form & Results Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <div className={`lg:col-span-5 rounded-3xl border ${
@@ -162,7 +145,7 @@ export default function PromptResearchPage() {
           </div>
 
         </div>
-
+        </ToolLandingWrapper>
       </main>
 
       <Footer isDark={isDark} />

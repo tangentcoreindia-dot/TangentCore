@@ -12,6 +12,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AiBackground } from '@/components/ui/ai-background';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
+import { ToolLandingWrapper } from '@/components/tools/tool-landing-wrapper';
 
 export default function BrandAuditorToolPage() {
   const { isDark } = useTheme();
@@ -73,29 +74,10 @@ export default function BrandAuditorToolPage() {
       <AiBackground isDark={isDark} />
       <Navbar ctaText="Full AI Audit" ctaHref="/dashboard" />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10 space-y-12">
-        
-        {/* Page Title Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className={`inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-xs font-mono font-bold ${
-            isDark ? 'bg-[#121315] border-white/10 text-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#B87333]'
-          } shadow-sm`}>
-            <Building2 className="w-3.5 h-3.5 text-[#C7A15A]" />
-            <span className="uppercase tracking-wider">Free Micro-Tool #01</span>
-          </div>
-
-          <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight ${
-            isDark ? 'text-[#F6F6F4]' : 'text-[#181818]'
-          }`}>
-            Brand & Competitor Audit Matrix
-          </h1>
-
-          <p className={`text-base sm:text-lg leading-relaxed ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-            Extract real brand logos in full original color, complete AI executive business summaries, top market competitors, and AEO citation scores.
-          </p>
-        </div>
-
-        {/* Audit Search Bar Input */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10">
+        <ToolLandingWrapper toolId="brand-auditor">
+          <div className="space-y-8">
+            {/* Audit Search Bar Input */}
         <div className={`max-w-2xl mx-auto rounded-3xl border ${
           isDark ? 'bg-[#121315]/90 border-white/10' : 'bg-white border-[#E5E3DF]'
         } p-6 sm:p-8 space-y-4 shadow-2xl backdrop-blur-md`}>
@@ -192,7 +174,9 @@ export default function BrandAuditorToolPage() {
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
             } p-6 sm:p-8 space-y-6 shadow-2xl`}>
               
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-white/10 pb-6">
+              <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b pb-6 ${
+                isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+              }`}>
                 
                 {/* Brand Title & Direct Domain Link */}
                 <div className="space-y-1">
@@ -328,7 +312,9 @@ export default function BrandAuditorToolPage() {
             <div className={`rounded-3xl border ${
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
             } p-6 sm:p-8 space-y-6 shadow-xl`}>
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className={`flex items-center justify-between border-b pb-4 ${
+                isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+              }`}>
                 <div className="flex items-center gap-2 text-sm font-mono font-bold uppercase tracking-wider text-[#C7A15A]">
                   <Bot className="w-4 h-4" />
                   <span>AI Generated Executive Business Summary</span>
@@ -391,7 +377,9 @@ export default function BrandAuditorToolPage() {
             <div className={`rounded-3xl border ${
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
             } p-6 sm:p-8 space-y-6 shadow-xl`}>
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className={`flex items-center justify-between border-b pb-4 ${
+                isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+              }`}>
                 <div className="flex items-center gap-2 text-sm font-mono font-bold uppercase tracking-wider text-[#C7A15A]">
                   <Layers className="w-4 h-4" />
                   <span>Top 4 Real Market Competitors Snapshot</span>
@@ -473,6 +461,8 @@ export default function BrandAuditorToolPage() {
           </div>
         )}
 
+          </div>
+        </ToolLandingWrapper>
       </main>
 
       <Footer isDark={isDark} />
