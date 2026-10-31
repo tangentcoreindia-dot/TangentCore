@@ -116,7 +116,9 @@ export default function CommerceCheckerPage() {
                 <div className={`rounded-3xl border ${
                   isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
                 } p-6 sm:p-8 space-y-6 shadow-xl`}>
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className={`flex items-center justify-between border-b pb-4 ${
+                    isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+                  }`}>
                     <span className="text-xs font-mono font-bold uppercase text-[#C7A15A]">
                       Agentic Shopping Readiness Score:
                     </span>
@@ -144,17 +146,21 @@ export default function CommerceCheckerPage() {
                     ))}
                   </div>
 
-                  <p className={`text-xs ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} leading-relaxed pt-2 border-t border-white/10`}>
+                  <p className={`text-xs ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} leading-relaxed pt-2 border-t ${
+                    isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+                  }`}>
                     💡 {result.recommendation}
                   </p>
                 </div>
               </div>
             ) : (
               <div className={`rounded-3xl border ${
-                isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-              } p-12 text-center space-y-3 text-white/40`}>
-                <ShoppingBag className="w-10 h-10 mx-auto stroke-[1.5]" />
-                <p className="text-xs font-mono">Enter e-commerce store URL on the left to audit agentic shopping protocols.</p>
+                isDark ? 'bg-[#121315] border-white/10 text-white/40' : 'bg-white border-[#E5E3DF] text-[#7A7A7A]'
+              } p-12 text-center space-y-3`}>
+                <ShoppingBag className={`w-10 h-10 mx-auto stroke-[1.5] ${isDark ? 'text-white/30' : 'text-[#7A7A7A]'}`} />
+                <p className={`text-xs font-mono ${isDark ? 'text-white/50' : 'text-[#5C5C5C]'}`}>
+                  Enter e-commerce store URL on the left to audit agentic shopping protocols.
+                </p>
               </div>
             )}
           </div>

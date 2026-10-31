@@ -133,7 +133,9 @@ export default function QueryFanoutPage() {
                           <h4 className={`text-sm font-extrabold ${isDark ? 'text-white' : 'text-[#181818]'}`}>
                             Sub-Query #{sub.id}: "{sub.prompt}"
                           </h4>
-                          <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-white/70">
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
+                            isDark ? 'bg-white/10 text-white/70' : 'bg-[#E5E3DF] text-[#181818]'
+                          }`}>
                             {sub.intent}
                           </span>
                         </div>
@@ -144,7 +146,11 @@ export default function QueryFanoutPage() {
                           </span>
                           <div className="flex flex-wrap gap-2 pt-1.5">
                             {sub.requiredTopics.map((top: string) => (
-                              <span key={top} className="px-2.5 py-1 rounded-xl bg-[#C7A15A]/15 text-[#C7A15A] text-xs font-mono font-bold flex items-center gap-1">
+                              <span key={top} className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1 ${
+                                isDark
+                                  ? 'bg-[#C7A15A]/15 text-[#C7A15A]'
+                                  : 'bg-[#B87333]/15 text-[#B87333]'
+                              }`}>
                                 <CheckCircle2 className="w-3 h-3" />
                                 <span>{top}</span>
                               </span>
@@ -155,17 +161,21 @@ export default function QueryFanoutPage() {
                     ))}
                   </div>
 
-                  <p className={`text-xs ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} leading-relaxed pt-2 border-t border-white/10`}>
+                  <p className={`text-xs ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} leading-relaxed pt-2 border-t ${
+                    isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+                  }`}>
                     💡 {result.recommendation}
                   </p>
                 </div>
               </div>
             ) : (
               <div className={`rounded-3xl border ${
-                isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-              } p-12 text-center space-y-3 text-white/40`}>
-                <Layers className="w-10 h-10 mx-auto stroke-[1.5]" />
-                <p className="text-xs font-mono">Enter target keyword on the left to simulate LLM query decomposition.</p>
+                isDark ? 'bg-[#121315] border-white/10 text-white/40' : 'bg-white border-[#E5E3DF] text-[#7A7A7A]'
+              } p-12 text-center space-y-3`}>
+                <Layers className={`w-10 h-10 mx-auto stroke-[1.5] ${isDark ? 'text-white/30' : 'text-[#7A7A7A]'}`} />
+                <p className={`text-xs font-mono ${isDark ? 'text-white/50' : 'text-[#5C5C5C]'}`}>
+                  Enter target keyword on the left to simulate LLM query decomposition.
+                </p>
               </div>
             )}
           </div>

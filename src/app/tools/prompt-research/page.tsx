@@ -136,10 +136,12 @@ export default function PromptResearchPage() {
               </div>
             ) : (
               <div className={`rounded-3xl border ${
-                isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-              } p-12 text-center space-y-3 text-white/40`}>
-                <Search className="w-10 h-10 mx-auto stroke-[1.5]" />
-                <p className="text-xs font-mono">Enter niche on the left to discover LLM buyer prompts.</p>
+                isDark ? 'bg-[#121315] border-white/10 text-white/40' : 'bg-white border-[#E5E3DF] text-[#7A7A7A]'
+              } p-12 text-center space-y-3`}>
+                <Search className={`w-10 h-10 mx-auto stroke-[1.5] ${isDark ? 'text-white/30' : 'text-[#7A7A7A]'}`} />
+                <p className={`text-xs font-mono ${isDark ? 'text-white/50' : 'text-[#5C5C5C]'}`}>
+                  Enter niche on the left to discover LLM buyer prompts.
+                </p>
               </div>
             )}
           </div>

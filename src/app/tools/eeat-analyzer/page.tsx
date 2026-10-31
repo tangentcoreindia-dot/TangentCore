@@ -162,7 +162,9 @@ export default function EeatAnalyzerPage() {
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
             } p-6 sm:p-8 space-y-6 shadow-2xl`}>
               
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+              <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-6 ${
+                isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+              }`}>
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className={`text-2xl font-extrabold ${isDark ? 'text-white' : 'text-[#181818]'}`}>
@@ -271,7 +273,9 @@ export default function EeatAnalyzerPage() {
               </div>
 
               {/* Trust Signal Verification Checklist */}
-              <div className="space-y-3 pt-4 border-t border-white/10">
+              <div className={`space-y-3 pt-4 border-t ${
+                isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+              }`}>
                 <span className={`text-xs font-mono font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-[#181818]'}`}>
                   Trust Signal Verification Checklist:
                 </span>

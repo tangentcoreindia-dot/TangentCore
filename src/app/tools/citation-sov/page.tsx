@@ -180,7 +180,9 @@ export default function CitationSovPage() {
             </form>
 
             {/* Quick Benchmark Pills */}
-            <div className="space-y-2 pt-2 border-t border-white/10">
+            <div className={`space-y-2 pt-2 border-t ${
+              isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+            }`}>
               <span className={`text-[10px] font-mono font-bold uppercase ${isDark ? 'text-[#B7B7B5]/70' : 'text-[#5C5C5C]'}`}>
                 Benchmark Competitor Sets:
               </span>
@@ -244,7 +246,9 @@ export default function CitationSovPage() {
                 <div className={`rounded-3xl border ${
                   isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
                 } p-6 sm:p-8 space-y-6 shadow-xl`}>
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className={`flex items-center justify-between border-b pb-4 ${
+                    isDark ? 'border-white/10' : 'border-[#E5E3DF]'
+                  }`}>
                     <div className="flex items-center gap-2 text-sm font-mono font-bold uppercase tracking-wider text-[#C7A15A]">
                       <BarChart3 className="w-4 h-4" />
                       <span>Live AI Citation Share Breakdown</span>
@@ -334,10 +338,12 @@ export default function CitationSovPage() {
 
             {!result && !loading && (
               <div className={`rounded-3xl border ${
-                isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-              } p-12 text-center space-y-3 text-white/40`}>
-                <BarChart3 className="w-10 h-10 mx-auto stroke-[1.5]" />
-                <p className="text-xs font-mono">Enter your brand & competitors to audit live AI Citation Share-of-Voice.</p>
+                isDark ? 'bg-[#121315] border-white/10 text-white/40' : 'bg-white border-[#E5E3DF] text-[#7A7A7A]'
+              } p-12 text-center space-y-3`}>
+                <BarChart3 className={`w-10 h-10 mx-auto stroke-[1.5] ${isDark ? 'text-white/30' : 'text-[#7A7A7A]'}`} />
+                <p className={`text-xs font-mono ${isDark ? 'text-white/50' : 'text-[#5C5C5C]'}`}>
+                  Enter your brand & competitors to audit live AI Citation Share-of-Voice.
+                </p>
               </div>
             )}
 
