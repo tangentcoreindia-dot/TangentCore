@@ -3,7 +3,13 @@ import { queryGeminiJSON } from '@/lib/gemini-client';
 
 export async function POST(req: Request) {
   try {
-    const { domainInput } = await req.json();
+    let domainInput = '';
+    try {
+      const body = await req.json();
+      domainInput = body?.domainInput || '';
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON request' }, { status: 400 });
+    }
 
     if (!domainInput || typeof domainInput !== 'string') {
       return NextResponse.json({ error: 'Domain is required' }, { status: 400 });
@@ -31,7 +37,7 @@ export async function POST(req: Request) {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         },
-        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
       });
 
       if (res.ok) {

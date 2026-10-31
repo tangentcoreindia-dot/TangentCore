@@ -25,10 +25,10 @@ export function BrandLogo({
       gap: 'gap-2.5',
     },
     md: {
-      img: 'h-9 sm:h-10 w-auto',
-      title: 'text-xl sm:text-2xl',
+      img: 'h-8 sm:h-10 w-auto',
+      title: 'text-lg sm:text-2xl',
       sub: 'text-[7.5px] sm:text-[8.5px] tracking-[0.22em]',
-      gap: 'gap-3',
+      gap: 'gap-2 sm:gap-3',
     },
     lg: {
       img: 'h-12 sm:h-14 w-auto',
@@ -61,7 +61,7 @@ export function BrandLogo({
         </div>
 
         {subtitle && (
-          <span className={`font-mono uppercase font-bold ${dimensions.sub} mt-1 ${
+          <span className={`font-mono uppercase font-bold ${dimensions.sub} mt-1 hidden sm:block ${
             isDark ? 'text-[#B7B7B5]' : 'text-[#3A3A3A]'
           }`}>
             {subtitle}

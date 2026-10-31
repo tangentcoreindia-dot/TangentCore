@@ -51,6 +51,7 @@ export default function PricingPage() {
   const { isDark } = useTheme();
   const [isAnnual, setIsAnnual] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<'starter' | 'growth' | 'enterprise'>('growth');
   const [selectedPlanPrice, setSelectedPlanPrice] = useState('$149');
   const [selectedFaqCategory, setSelectedFaqCategory] = useState<string>('all');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -136,7 +137,8 @@ export default function PricingPage() {
     return faqs.filter((faq) => faq.category === selectedFaqCategory);
   }, [selectedFaqCategory]);
 
-  const handleOpenCheckout = (priceStr: string) => {
+  const handleOpenCheckout = (planId: 'starter' | 'growth' | 'enterprise', priceStr: string) => {
+    setSelectedPlanId(planId);
     setSelectedPlanPrice(priceStr);
     setIsModalOpen(true);
   };
@@ -294,16 +296,19 @@ export default function PricingPage() {
               <div className={`my-6 p-4 rounded-2xl border ${
                 isDark ? 'bg-[#121315] border-white/10' : 'bg-[#F6F5F3] border-[#E5E3DF]'
               }`}>
-                <div className="flex items-baseline gap-2">
-                  <span className={`text-4xl font-black ${isDark ? 'champagne-gradient-text' : 'text-[#181818]'}`}>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className={`text-3xl sm:text-4xl font-black ${isDark ? 'champagne-gradient-text' : 'text-[#181818]'}`}>
                     {isAnnual ? '$31' : '$39'}
                   </span>
                   <span className={`text-xs font-semibold ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
                     / month
                   </span>
+                  <span className="text-xs font-mono font-bold text-[#C7A15A]">
+                    ({isAnnual ? '₹31,499/yr' : '₹3,299/mo'})
+                  </span>
                 </div>
                 <span className={`text-[11px] font-medium block mt-1 ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-                  {isAnnual ? 'Billed $372 annually' : 'Flexible monthly billing'}
+                  {isAnnual ? 'Billed $372 annually (Save 20%)' : 'Flexible monthly billing via Razorpay'}
                 </span>
               </div>
 
@@ -356,10 +361,10 @@ export default function PricingPage() {
             {/* CTA Button */}
             <div className="mt-8">
               <button
-                onClick={() => handleOpenCheckout(isAnnual ? '$31' : '$39')}
-                className="w-full py-3.5 rounded-2xl luxury-btn-secondary font-bold text-xs transition-all"
+                onClick={() => handleOpenCheckout('starter', isAnnual ? '$31' : '$39')}
+                className="w-full py-3.5 rounded-2xl luxury-btn-secondary font-bold text-xs transition-all cursor-pointer"
               >
-                Select Starter Plan ($39/mo)
+                Select Starter Plan ({isAnnual ? '₹31,499/yr' : '₹3,299/mo'})
               </button>
             </div>
           </motion.div>
@@ -395,16 +400,19 @@ export default function PricingPage() {
               <div className={`my-6 p-4 rounded-2xl border ${
                 isDark ? 'bg-[#121315] border-[#C7A15A]/40' : 'bg-[#F6F5F3] border-[#B87333]/30'
               }`}>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 flex-wrap">
                   <span className={`text-4xl sm:text-5xl font-black ${isDark ? 'champagne-gradient-text' : 'text-[#181818]'}`}>
                     {isAnnual ? '$119' : '$149'}
                   </span>
                   <span className={`text-xs font-semibold ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
                     / month
                   </span>
+                  <span className="text-xs font-mono font-bold text-[#C7A15A]">
+                    ({isAnnual ? '₹1,19,999/yr' : '₹12,499/mo'})
+                  </span>
                 </div>
                 <span className={`text-xs font-medium block mt-1 ${isDark ? 'text-[#C7A15A]' : 'text-[#B87333]'}`}>
-                  {isAnnual ? 'Save $360 annually (Billed $1,428/yr)' : 'Full Multi-LLM GEO Suite Access'}
+                  {isAnnual ? 'Save $360 annually (Billed $1,428/yr)' : 'Full Multi-LLM GEO Suite Access via Razorpay'}
                 </span>
               </div>
 
@@ -467,11 +475,11 @@ export default function PricingPage() {
             {/* CTA Button */}
             <div className="mt-8 space-y-2">
               <button
-                onClick={() => handleOpenCheckout(isAnnual ? '$119' : '$149')}
+                onClick={() => handleOpenCheckout('growth', isAnnual ? '$119' : '$149')}
                 className="w-full py-4 rounded-2xl luxury-btn-primary font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.02]"
               >
                 <Zap className="w-4 h-4 fill-[#111111] text-[#111111]" />
-                <span>Get Started Now — {isAnnual ? '$119' : '$149'}/mo</span>
+                <span>Get Started Now — {isAnnual ? '₹1,19,999/yr' : '₹12,499/mo'}</span>
               </button>
               <div className={`text-[11px] text-center ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
                 <p className="font-bold text-[#C7A15A]">
@@ -508,16 +516,19 @@ export default function PricingPage() {
               <div className={`my-6 p-4 rounded-2xl border ${
                 isDark ? 'bg-[#121315] border-white/10' : 'bg-[#F6F5F3] border-[#E5E3DF]'
               }`}>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 flex-wrap">
                   <span className={`text-3xl sm:text-4xl font-black ${isDark ? 'champagne-gradient-text' : 'text-[#181818]'}`}>
                     {isAnnual ? '$319' : '$399'}
                   </span>
                   <span className={`text-xs font-semibold ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
                     / month
                   </span>
+                  <span className="text-xs font-mono font-bold text-[#C7A15A]">
+                    ({isAnnual ? '₹3,19,999/yr' : '₹32,999/mo'})
+                  </span>
                 </div>
                 <span className={`text-[11px] font-medium block mt-1 ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`}>
-                  {isAnnual ? 'Billed $3,828 annually' : 'Flexible monthly contract'}
+                  {isAnnual ? 'Billed $3,828 annually (Save 20%)' : 'Flexible monthly contract via Razorpay'}
                 </span>
               </div>
 
@@ -572,10 +583,10 @@ export default function PricingPage() {
             {/* CTA Button */}
             <div className="mt-8">
               <button
-                onClick={() => handleOpenCheckout(isAnnual ? '$319' : '$399')}
-                className="w-full py-3.5 rounded-2xl luxury-btn-secondary font-bold text-xs transition-all"
+                onClick={() => handleOpenCheckout('enterprise', isAnnual ? '$319' : '$399')}
+                className="w-full py-3.5 rounded-2xl luxury-btn-secondary font-bold text-xs transition-all cursor-pointer"
               >
-                Select Enterprise ($399/mo)
+                Select Enterprise ({isAnnual ? '₹3,19,999/yr' : '₹32,999/mo'})
               </button>
             </div>
           </motion.div>
@@ -801,8 +812,10 @@ export default function PricingPage() {
       <CheckoutModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        planId={selectedPlanId}
         planPrice={selectedPlanPrice}
         isAnnual={isAnnual}
+        isDark={isDark}
       />
     </div>
   );

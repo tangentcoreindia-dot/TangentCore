@@ -74,81 +74,109 @@ export default function BrandAuditorToolPage() {
       <AiBackground isDark={isDark} />
       <Navbar ctaText="Full AI Audit" ctaHref="/dashboard" />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 relative z-10">
         <ToolLandingWrapper toolId="brand-auditor">
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Audit Search Bar Input */}
-        <div className={`max-w-2xl mx-auto rounded-3xl border ${
-          isDark ? 'bg-[#121315]/90 border-white/10' : 'bg-white border-[#E5E3DF]'
-        } p-6 sm:p-8 space-y-4 shadow-2xl backdrop-blur-md`}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleRunAudit();
-            }}
-            className="space-y-4"
-          >
-            <label className={`block text-xs font-mono font-bold uppercase tracking-wider ${
-              isDark ? 'text-white' : 'text-[#181818]'
-            }`}>
-              Enter Website Domain to Audit
-            </label>
-            <div className="relative">
-              <Globe className={`absolute left-4 top-4 h-4 w-4 ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`} />
-              <input
-                type="text"
-                value={domainInput}
-                onChange={(e) => setDomainInput(e.target.value)}
-                placeholder="e.g. rajaranicoaching.com or swiggy.com"
-                className={`w-full ${
-                  isDark
-                    ? 'bg-[#1B1C1F] border-white/10 text-white placeholder-[#B7B7B5]/60 focus:border-[#C7A15A]'
-                    : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#181818] placeholder-[#5C5C5C]/60 focus:border-[#B87333]'
-                } border rounded-2xl pl-11 pr-36 py-3.5 text-sm focus:outline-none transition-all shadow-sm`}
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="absolute right-1.5 top-1.5 bottom-1.5 px-5 rounded-xl luxury-btn-primary text-xs font-bold flex items-center gap-2 shadow-md hover:scale-[1.02] transition-transform"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Auditing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Search className="w-3.5 h-3.5" />
-                    <span>Run Audit</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Quick Try Domain Pills */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <span className={`text-xs font-mono font-bold ${isDark ? 'text-[#B7B7B5]/60' : 'text-[#5C5C5C]/70'}`}>
-              Try sample:
-            </span>
-            {sampleDomains.map((sample) => (
-              <button
-                key={sample}
-                onClick={() => {
-                  setDomainInput(sample);
-                  handleRunAudit(sample);
+            <div className="max-w-2xl mx-auto space-y-3.5">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRunAudit();
                 }}
-                className={`px-3 py-1 rounded-xl border text-xs font-mono font-medium ${
-                  isDark
-                    ? 'bg-[#1B1C1F] border-white/10 text-[#B7B7B5] hover:text-white hover:border-[#C7A15A]'
-                    : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#5C5C5C] hover:text-[#181818] hover:border-[#B87333]'
-                } transition-all`}
+                className="space-y-3"
               >
-                {sample}
-              </button>
-            ))}
-          </div>
-        </div>
+                <div className="flex items-center justify-between">
+                  <label className={`block text-xs font-mono font-bold uppercase tracking-wider ${
+                    isDark ? 'text-white' : 'text-[#181818]'
+                  }`}>
+                    Enter Website Domain
+                  </label>
+                  <span className={`text-[10px] font-mono ${isDark ? 'text-[#85858A]' : 'text-[#7A7A7A]'}`}>
+                    Real-Time Discovery
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Globe className={`absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`} />
+                    <input
+                      type="text"
+                      value={domainInput}
+                      onChange={(e) => setDomainInput(e.target.value)}
+                      placeholder="e.g. rajaranicoaching.com or swiggy.com"
+                      className={`w-full ${
+                        isDark
+                          ? 'bg-[#1B1C1F] border-white/10 text-white placeholder-[#B7B7B5]/60 focus:border-[#C7A15A]'
+                          : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#181818] placeholder-[#5C5C5C]/60 focus:border-[#B87333]'
+                      } border rounded-2xl pl-10 pr-3 sm:pr-36 py-3.5 text-xs sm:text-sm focus:outline-none transition-all shadow-xs`}
+                    />
+                    
+                    {/* Desktop/Tablet Inline Button */}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="hidden sm:inline-flex absolute right-1.5 top-1.5 bottom-1.5 px-5 rounded-xl luxury-btn-primary text-xs font-bold items-center gap-2 shadow-md hover:scale-[1.02] transition-transform cursor-pointer"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Auditing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Search className="w-3.5 h-3.5" />
+                          <span>Run Audit</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Mobile-Only Prominent Full-Width Button (Never squished) */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="sm:hidden w-full py-3.5 rounded-2xl luxury-btn-primary text-xs font-bold flex items-center justify-center gap-2 shadow-md active:scale-98 transition-transform cursor-pointer"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Auditing Domain...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-3.5 h-3.5" />
+                        <span>Run Brand & Competitor Audit</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Quick Try Domain Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className={`text-[10px] font-mono font-bold ${isDark ? 'text-[#B7B7B5]/70' : 'text-[#5C5C5C]'}`}>
+                  Try sample:
+                </span>
+                {sampleDomains.map((sample) => (
+                  <button
+                    key={sample}
+                    type="button"
+                    onClick={() => {
+                      setDomainInput(sample);
+                      handleRunAudit(sample);
+                    }}
+                    className={`px-2 py-0.5 rounded-lg border text-[10px] font-mono font-medium ${
+                      isDark
+                        ? 'bg-[#1B1C1F] border-white/10 text-[#B7B7B5] hover:text-white hover:border-[#C7A15A]'
+                        : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#5C5C5C] hover:text-[#181818] hover:border-[#B87333]'
+                    } transition-all cursor-pointer`}
+                  >
+                    {sample}
+                  </button>
+                ))}
+              </div>
+            </div>
 
         {/* Loading State Skeleton */}
         {loading && (
@@ -172,16 +200,16 @@ export default function BrandAuditorToolPage() {
             {/* Card 1: Brand Overview & LOGO */}
             <div className={`rounded-3xl border ${
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-            } p-6 sm:p-8 space-y-6 shadow-2xl`}>
+            } p-4 sm:p-8 space-y-6 shadow-2xl`}>
               
-              <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b pb-6 ${
+              <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-5 border-b pb-6 ${
                 isDark ? 'border-white/10' : 'border-[#E5E3DF]'
               }`}>
                 
                 {/* Brand Title & Direct Domain Link */}
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h2 className={`text-2xl font-extrabold ${isDark ? 'text-white' : 'text-[#181818]'}`}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className={`text-xl sm:text-2xl font-extrabold ${isDark ? 'text-white' : 'text-[#181818]'}`}>
                       {auditResult.brandName}
                     </h2>
                     <span className="px-2.5 py-0.5 rounded-md bg-[#C7A15A]/20 border border-[#C7A15A]/40 text-[#C7A15A] text-[10px] font-mono font-bold uppercase">
@@ -202,7 +230,7 @@ export default function BrandAuditorToolPage() {
                 </div>
 
                 {/* LOGO Box with Background Controls */}
-                <div className="flex items-center gap-6">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-6 w-full md:w-auto justify-between md:justify-end">
                   <div className={`p-4 rounded-2xl border flex flex-col items-center gap-3 ${
                     isDark ? 'bg-[#1B1C1F] border-white/10' : 'bg-[#F6F5F3] border-[#E5E3DF]'
                   }`}>
@@ -311,7 +339,7 @@ export default function BrandAuditorToolPage() {
             {/* Card 2: Complete AI Executive Business Summary */}
             <div className={`rounded-3xl border ${
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-            } p-6 sm:p-8 space-y-6 shadow-xl`}>
+            } p-4 sm:p-7 space-y-5 sm:space-y-6 shadow-xl`}>
               <div className={`flex items-center justify-between border-b pb-4 ${
                 isDark ? 'border-white/10' : 'border-[#E5E3DF]'
               }`}>
@@ -376,7 +404,7 @@ export default function BrandAuditorToolPage() {
             {/* Card 3: REAL Market Competitors Snapshot */}
             <div className={`rounded-3xl border ${
               isDark ? 'bg-[#121315] border-white/10' : 'bg-white border-[#E5E3DF]'
-            } p-6 sm:p-8 space-y-6 shadow-xl`}>
+            } p-4 sm:p-7 space-y-5 sm:space-y-6 shadow-xl`}>
               <div className={`flex items-center justify-between border-b pb-4 ${
                 isDark ? 'border-white/10' : 'border-[#E5E3DF]'
               }`}>
@@ -435,7 +463,7 @@ export default function BrandAuditorToolPage() {
             </div>
 
             {/* Card 4: CTA to Full Audit */}
-            <div className={`rounded-3xl p-8 text-center space-y-6 shadow-2xl border ${
+            <div className={`rounded-3xl p-5 sm:p-8 text-center space-y-5 sm:space-y-6 shadow-2xl border ${
               isDark 
                 ? 'luxury-gradient-card border-[#C7A15A]/40' 
                 : 'bg-white border-[#E5E3DF]'

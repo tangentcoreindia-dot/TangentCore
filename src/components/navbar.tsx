@@ -63,9 +63,9 @@ export function Navbar({
     <nav
       className={`border-b ${
         isDark ? 'border-white/10 bg-[#0B0B0C]/90 text-[#F6F6F4]' : 'border-[#E5E3DF] bg-[#FCFCFB]/90 text-[#181818]'
-      } backdrop-blur-2xl sticky top-0 z-40 transition-colors duration-300`}
+      } backdrop-blur-2xl sticky top-0 z-40 transition-colors duration-300 w-full max-w-full overflow-x-clip`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4 w-full">
         
         {/* Left: Brand Logo */}
         <div className="flex items-center shrink-0">
@@ -131,21 +131,22 @@ export function Navbar({
               {pathname !== '/dashboard' && (
                 <Link
                   href="/dashboard"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
                     isDark
                       ? 'bg-[#18191C] border-white/10 text-white hover:border-[#C7A15A]'
                       : 'bg-white border-[#E5E3DF] text-[#181818] hover:border-[#B87333] shadow-xs'
                   }`}
+                  title="Dashboard"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span>Dashboard</span>
+                  <span className="hidden sm:inline">Dashboard</span>
                 </Link>
               )}
 
               <button
                 type="button"
                 onClick={handleLogout}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
                   isDark
                     ? 'bg-[#121315] border-red-500/20 text-red-400 hover:bg-red-500/10 hover:border-red-500/40'
                     : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300'
@@ -153,7 +154,7 @@ export function Navbar({
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           ) : (

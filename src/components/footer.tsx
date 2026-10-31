@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Twitter, Github, Linkedin, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Twitter, Github, Linkedin, Sparkles, CheckCircle2, ChevronDown } from 'lucide-react';
 import { BrandLogo } from '@/components/ui/brand-logo';
 
 interface FooterProps {
@@ -12,6 +12,11 @@ interface FooterProps {
 export function Footer({ isDark = true }: FooterProps) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (section: string) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,81 +147,60 @@ export function Footer({ isDark = true }: FooterProps) {
             </div>
           </div>
 
-          {/* Col 2: PLATFORM (lg:col-span-2) */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-sm sm:text-base font-mono font-bold uppercase tracking-wider text-white">
-              PLATFORM
-            </h4>
-            <ul className="space-y-3 text-sm sm:text-base font-medium">
-              {platformLinks.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Right Columns: PLATFORM, RESOURCES, COMPANY, LEGAL with Mobile Accordion Dropdowns */}
+          {[
+            { id: 'platform', title: 'PLATFORM', links: platformLinks, isExternal: false },
+            { id: 'resources', title: 'RESOURCES', links: resourceLinks, isExternal: false },
+            { id: 'company', title: 'COMPANY', links: companyLinks, isExternal: false },
+            { id: 'legal', title: 'LEGAL', links: legalLinks, isExternal: false },
+          ].map((sec) => {
+            const isOpen = openSection === sec.id;
+            return (
+              <div 
+                key={sec.id} 
+                className="lg:col-span-2 border-b md:border-b-0 border-white/10 pb-3 md:pb-0 space-y-2 md:space-y-4"
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleSection(sec.id)}
+                  className="w-full flex items-center justify-between text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-white md:cursor-default py-1 md:py-0"
+                >
+                  <span>{sec.title}</span>
+                  <ChevronDown 
+                    className={`w-4 h-4 md:hidden transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-[#C7A15A]' : 'text-[#85858A]'
+                    }`} 
+                  />
+                </button>
 
-          {/* Col 3: RESOURCES (lg:col-span-2) */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-sm sm:text-base font-mono font-bold uppercase tracking-wider text-white">
-              RESOURCES
-            </h4>
-            <ul className="space-y-3 text-sm sm:text-base font-medium">
-              {resourceLinks.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 4: COMPANY (lg:col-span-2) */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-sm sm:text-base font-mono font-bold uppercase tracking-wider text-white">
-              COMPANY
-            </h4>
-            <ul className="space-y-3 text-sm sm:text-base font-medium">
-              {companyLinks.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 5: LEGAL (lg:col-span-2) */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-sm sm:text-base font-mono font-bold uppercase tracking-wider text-white">
-              LEGAL
-            </h4>
-            <ul className="space-y-3 text-sm sm:text-base font-medium">
-              {legalLinks.map((item) => (
-                <li key={item.label}>
-                  <a
-                    href={item.href}
-                    className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+                <ul className={`space-y-2.5 text-xs sm:text-sm font-medium pt-1 md:pt-0 ${
+                  isOpen ? 'block animate-in fade-in duration-200' : 'hidden md:block'
+                }`}>
+                  {sec.links.map((item) => (
+                    <li key={item.label}>
+                      {item.href.startsWith('http') ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className="text-[#A0A0A5] hover:text-[#C7A15A] transition-colors block py-0.5"
+                        >
+                          {item.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
 
         </div>
 

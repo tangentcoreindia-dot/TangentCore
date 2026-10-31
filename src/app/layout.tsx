@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased bg-[#0B0B0C] text-[#F6F6F4] min-h-screen" suppressHydrationWarning>
+      <body className="antialiased bg-[#0B0B0C] text-[#F6F6F4] min-h-screen overflow-x-hidden w-full max-w-full" suppressHydrationWarning>
         <ThemeProvider>
           {children}
           <Toaster position="top-right" theme="dark" richColors />
