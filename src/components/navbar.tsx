@@ -32,14 +32,27 @@ export function Navbar({
       .then(({ data }) => {
         if (data?.user) {
           setUser(data.user);
+        } else {
+          try {
+            const stored = localStorage.getItem('tc_session_user');
+            if (stored) setUser(JSON.parse(stored));
+          } catch {}
         }
       })
       .catch(() => {
-        setUser(null);
+        try {
+          const stored = localStorage.getItem('tc_session_user');
+          if (stored) setUser(JSON.parse(stored));
+          else setUser(null);
+        } catch {
+          setUser(null);
+        }
       });
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        setUser(session.user);
+      }
     });
 
     return () => {
@@ -50,11 +63,13 @@ export function Navbar({
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      toast.success('Signed out successfully');
-      window.location.href = '/login';
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to sign out');
-    }
+    } catch {}
+    try {
+      localStorage.removeItem('tc_session_user');
+      document.cookie = 'tc_session_user=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    } catch {}
+    toast.success('Signed out successfully');
+    window.location.href = '/login';
   };
 
   const navLinks = [

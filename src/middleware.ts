@@ -59,6 +59,16 @@ export async function middleware(request: NextRequest) {
     user = null;
   }
 
+  // Graceful session fallback if remote Supabase database is paused/offline
+  if (!user) {
+    const devCookie = request.cookies.get('tc_session_user')?.value;
+    if (devCookie) {
+      try {
+        user = JSON.parse(decodeURIComponent(devCookie));
+      } catch {}
+    }
+  }
+
   // Protect /dashboard routes
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone();

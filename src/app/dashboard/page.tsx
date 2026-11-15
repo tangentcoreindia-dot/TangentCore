@@ -64,10 +64,21 @@ export default function DashboardPage() {
       .then(({ data }) => {
         if (data?.user) {
           setUserEmail(data.user.email || 'User');
+        } else {
+          try {
+            const stored = localStorage.getItem('tc_session_user');
+            if (stored) setUserEmail(JSON.parse(stored).email || 'User');
+          } catch {}
         }
       })
       .catch(() => {
-        setUserEmail('User');
+        try {
+          const stored = localStorage.getItem('tc_session_user');
+          if (stored) setUserEmail(JSON.parse(stored).email || 'User');
+          else setUserEmail('User');
+        } catch {
+          setUserEmail('User');
+        }
       });
 
     // Load cached audit and saved lead details from localStorage/sessionStorage
