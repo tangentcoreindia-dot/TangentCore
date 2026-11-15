@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     const actualPromptsToScan = isQuickScan ? 1 : Math.min(20, Math.max(1, Number(promptCount) || 5));
 
     // 1. Run Page Audit & AI Auto-Discovery of Keywords + Competitors + Brand Profile
-    const pageAudit = await analyzePageGeo(cleanDomain, keywords, competitors);
+    const pageAudit = await analyzePageGeo(cleanDomain, keywords, competitors, actualPromptsToScan);
 
     const targetBrand = brandName || pageAudit.brandName || cleanDomain.split('.')[0].toUpperCase();
     const activeKeywords = pageAudit.autoDiscoveredKeywords;

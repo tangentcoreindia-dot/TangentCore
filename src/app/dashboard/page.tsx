@@ -423,39 +423,6 @@ export default function DashboardPage() {
           </div>
         </ScrollReveal>
 
-        {/* Analyzed Websites Switcher Tabs (Hidden during print) */}
-        {analyzedProjects.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-print">
-            <span className={`text-xs font-bold ${isDark ? 'text-[#9E9E9E]' : 'text-slate-600'} uppercase tracking-wider shrink-0 mr-1`}>
-              Recent Audits:
-            </span>
-            {analyzedProjects.map((proj) => {
-              const isSelected = activeAuditData?.domain === proj.domain;
-              return (
-                <button
-                  key={proj.domain}
-                  onClick={() => {
-                    setActiveAuditData(proj);
-                    try { localStorage.setItem('tangentcore_last_audit', JSON.stringify(proj)); } catch {}
-                  }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shrink-0 border ${
-                    isSelected
-                      ? isDark
-                        ? 'bg-[#D4AF37] text-[#111111] border-[#D4AF37] font-extrabold shadow-sm'
-                        : 'bg-cyan-600 text-white border-cyan-600 shadow-md'
-                      : isDark
-                      ? 'bg-[#181818] border-[#2A2A2A] text-[#9E9E9E] hover:text-white hover:border-[#D4AF37]'
-                      : 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 shadow-2xs'
-                  }`}
-                >
-                  <Globe className="w-3.5 h-3.5" />
-                  <span>{proj.domain}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
         {/* Audit Results View or Initial Empty State */}
         {!activeAuditData ? (
           <ScrollReveal variant="scaleUp" duration={0.55}>
@@ -523,23 +490,6 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <button
-                    onClick={() => {
-                      if (whatsappDeliveryUrl) {
-                        window.open(whatsappDeliveryUrl, '_blank');
-                      } else {
-                        const clean = (leadPhone || '').replace(/[^0-9]/g, '');
-                        const txt = encodeURIComponent(`Hi, here is the TangentCore GEO Audit Report for ${activeAuditData.domain}: https://www.tangentcore.in/dashboard?domain=${activeAuditData.domain}`);
-                        window.open(`https://api.whatsapp.com/send?phone=${clean}&text=${txt}`, '_blank');
-                      }
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] text-white text-xs font-bold hover:bg-[#20ba59] transition-all shadow-md shadow-emerald-500/20"
-                    title="Send or Open in WhatsApp"
-                  >
-                    <MessageCircle className="w-4 h-4 fill-white stroke-none" />
-                    <span>WhatsApp</span>
-                  </button>
-
                   <button
                     onClick={() => setIsSdkModalOpen(true)}
                     className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-lime-400 text-neutral-950 text-xs font-bold uppercase tracking-wider hover:bg-lime-300 transition-all shadow-[0_0_15px_rgba(216,243,28,0.2)]"
@@ -932,16 +882,6 @@ export default function DashboardPage() {
 
             {/* DEDICATED MULTI-PAGE EXECUTIVE PRINT REPORT (GEO STUDIO PARITY) */}
             <PrintableExecutiveReport auditData={activeAuditData} />
-
-            {/* GEO Studio Parity: Delivery Status Badge (Bottom Right) */}
-            <LeadDeliveryBadge
-              email={leadEmail}
-              phone={leadPhone}
-              whatsappUrl={whatsappDeliveryUrl}
-              whatsappText={whatsappDeliveryText}
-              domain={activeAuditData.domain}
-              isDark={isDark}
-            />
           </>
         )}
 

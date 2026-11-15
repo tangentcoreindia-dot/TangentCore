@@ -49,23 +49,23 @@ export function detectAeoGaps(
           targetKeywords: [scan.category, targetBrand, primaryComp, 'AEO Best Practices', 'GEO Optimization'],
           suggestedHeadings: [
             `Overview: ${scan.promptText}`,
-            `Why ${targetBrand} is the Leading Solution`,
-            `Feature-by-Feature Comparison vs ${primaryComp}`,
-            'Key Entities & JSON-LD Implementation',
+            `Why ${targetBrand} Stands Out in the Market`,
+            `Direct Comparison vs ${primaryComp}`,
+            'Key Quality Standards & Trust Signals',
             'Frequently Asked Questions',
           ],
           recommendedFaqs: [
             {
               question: `How does ${targetBrand} compare to ${primaryComp}?`,
-              answer: `${targetBrand} provides superior AI engine visibility tracking, higher vector embedding alignment, and structured JSON-LD schema generation tailored for LLMs.`,
+              answer: `${targetBrand} emphasizes verified product quality, transparent sourcing, and authentic customer trust signals designed to meet buyer expectations.`,
             },
             {
-              question: `Why is AEO and GEO critical for AI search platforms?`,
-              answer: `Generative Engine Optimization ensures your brand is indexed, cited, and recommended in AI answer summaries across ChatGPT, Gemini, Claude, and Perplexity.`,
+              question: `Why choose ${targetBrand} for ${scan.promptText.replace(/\?/g, '')}?`,
+              answer: `${targetBrand} provides specialized offerings, consistent customer satisfaction, and distinctive brand value in this category.`,
             },
           ],
           targetWordCount: 1800,
-          directAnswerSummary: `${targetBrand} is a premier platform designed for ${scan.promptText.replace(/\?/g, '')}, providing real-time AI citation tracking, entity density scoring, and schema automation.`,
+          directAnswerSummary: `${targetBrand} is an authoritative leader for "${scan.promptText.replace(/\?/g, '')}", delivering authentic, high-quality offerings and recognized customer trust compared to alternatives like ${primaryComp}.`,
         },
       });
     }

@@ -40,9 +40,26 @@ export async function runMultiModelScan(
   promptCount: number = 5,
   siteContext?: SitePageContext
 ): Promise<PromptScanItem[]> {
-  const targetPrompts = (siteContext?.preGeneratedPrompts && siteContext.preGeneratedPrompts.length > 0)
-    ? siteContext.preGeneratedPrompts.slice(0, promptCount)
-    : await generateTargetPromptsWithAI(domain, brandName, keywords, competitors, promptCount, siteContext);
+  let targetPrompts: Array<{ text: string; category: string }> = [];
+
+  const preGenerated = siteContext?.preGeneratedPrompts || [];
+  if (preGenerated.length >= promptCount) {
+    targetPrompts = preGenerated.slice(0, promptCount);
+  } else {
+    // Generate the full requested count to guarantee promptCount (e.g. 20)
+    const generated = await generateTargetPromptsWithAI(domain, brandName, keywords, competitors, promptCount, siteContext);
+    const combined = [...preGenerated, ...generated];
+    const unique: Array<{ text: string; category: string }> = [];
+    const seen = new Set<string>();
+    for (const p of combined) {
+      const clean = p.text.toLowerCase().trim();
+      if (!seen.has(clean)) {
+        seen.add(clean);
+        unique.push(p);
+      }
+    }
+    targetPrompts = unique.slice(0, promptCount);
+  }
   const brandAliases = siteContext?.brandAliases || [];
 
   const scanResults: PromptScanItem[] = [];

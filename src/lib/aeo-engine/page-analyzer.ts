@@ -303,7 +303,8 @@ async function crawlInternalPages(domain: string, cleanUrl: string, rootHtml: st
 export async function analyzePageGeo(
   targetUrl: string,
   userKeywords: string[] = [],
-  userCompetitors: string[] = []
+  userCompetitors: string[] = [],
+  targetPromptsCount: number = 5
 ): Promise<PageGeoAuditResult> {
   const trimmed = (targetUrl || '').trim();
   const cleanUrl = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
@@ -444,7 +445,7 @@ CRITICAL INSTRUCTIONS FOR ACCURACY:
    - STRICT NICHE LOCK: Every competitor MUST sell the exact same type of product/service. Never include unrelated brands from other industries (e.g. if target sells jewelry, DO NOT include cosmetics, haircare like arata, clothing, or electronics).
    - ACCURATE DOMAINS: Return lowercase, valid, real domains with correct spelling (e.g. "bluestone.com", "caratlane.com", "melorra.com", "tanishq.co.in", "shaya.co.in"). Never invent typos (e.g. "blucstone" is wrong).
    - REGIONAL / VERNACULAR / INDIAN PORTALS: If target is a regional Indian automotive portal, commercial vehicle or used car marketplace (e.g. "junigadi.com" = used car/commercial vehicle portal in Gujarat), competitors are direct Indian automotive marketplaces: "cardekho.com", "carwale.com", "spinny.com", "cars24.com", "olx.in".
-6. "prompts": Exactly 5 natural buyer queries that prospective customers type into AI search engines (ChatGPT, Claude, Perplexity) when shopping for these exact products/services. Do not mention the target brand name in the prompts.
+6. "prompts": Exactly ${Math.min(20, Math.max(5, targetPromptsCount))} natural buyer queries that prospective customers type into AI search engines (ChatGPT, Claude, Perplexity) when shopping for these exact products/services. Do not mention the target brand name in the prompts. Ensure prompts are diverse across generic industry queries, feature-specific searches, problem-solving, and comparison queries.
 
 Return ONLY valid JSON matching this schema:
 {
@@ -711,7 +712,9 @@ Return strictly valid JSON:
         "name": `What is ${aiBrandName}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${aiBrandName} is a leading platform designed for ${aiKeywords.slice(0, 3).join(', ')}. It helps businesses and teams streamline operations and optimize results.`
+          "text": aiCategoryDescription
+            ? `${aiBrandName} is ${aiCategoryDescription.charAt(0).toLowerCase() + aiCategoryDescription.slice(1)}`
+            : `${aiBrandName} is an established brand specializing in ${aiKeywords.slice(0, 3).join(', ')}.`
         }
       },
       {
@@ -719,15 +722,15 @@ Return strictly valid JSON:
         "name": `How does ${aiBrandName} compare to ${aiCompetitors[0] || 'competitors'}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `Unlike traditional alternatives like ${aiCompetitors[0] || 'legacy tools'}, ${aiBrandName} provides automated workflows, superior AI search visibility, and seamless modern integration.`
+          "text": `${aiBrandName} differentiates itself through high standards of quality, dedicated customer care, and specialized expertise in ${aiKeywords.slice(0, 2).join(' and ')}, offering distinct value over alternatives like ${aiCompetitors[0] || 'competitors'}.`
         }
       },
       {
         "@type": "Question",
-        "name": `Who is ${aiBrandName} built for?`,
+        "name": `What products and services does ${aiBrandName} offer?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${aiBrandName} is built for modern digital businesses, growth teams, and agencies looking to scale their online presence.`
+          "text": `${aiBrandName} offers a curated range of ${aiKeywords.slice(0, 4).join(', ')} designed to deliver authentic, high-value experiences for customers.`
         }
       }
     ]
@@ -749,13 +752,13 @@ Return strictly valid JSON:
   const generatedLlmsTxt = `# ${aiBrandName} LLM Index
 > ${finalDesc}
 
-## Core Solutions & Products
+## Core Offerings & Categories
 ${aiKeywords.map(k => `- [${k}](${cleanUrl}/#${k.toLowerCase().replace(/\s+/g, '-')})`).join('\n')}
 
-## Key Differentiators vs. Competitors
-- Faster implementation than ${aiCompetitors[0] || 'competitors'}
-- Built-in Generative Engine Optimization (GEO) compatibility
-- Direct AI search citation readiness for ChatGPT, Claude, and Perplexity
+## Brand Values & Quality Commitments
+- Verified quality and dedicated craftsmanship across all ${aiBrandName} offerings
+- Authentic customer experiences and direct brand transparency
+- Leading market alternative to ${aiCompetitors[0] || 'traditional options'}
 `;
 
   const actionsQueue: DeployableFixAction[] = [];
@@ -795,7 +798,9 @@ ${aiKeywords.map(k => `- [${k}](${cleanUrl}/#${k.toLowerCase().replace(/\s+/g, '
   }
 
   if (rawDescription.length < 100) {
-    const optimizedDesc = `${aiBrandName} is the premier platform for ${aiKeywords.slice(0, 3).join(', ')}. Discover features, pricing, and live benchmarks today.`;
+    const optimizedDesc = aiCategoryDescription
+      ? `${aiBrandName} — ${aiCategoryDescription}. Explore authentic offerings and customer favorites today.`
+      : `${aiBrandName} — Discover high-quality ${aiKeywords.slice(0, 3).join(', ')}. Explore official collections and latest updates.`;
     actionsQueue.push({
       id: 'fix-meta-desc',
       title: 'Optimize Meta Description for AI Search Snippets',
