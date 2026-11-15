@@ -35,11 +35,11 @@ export async function createClient() {
           } catch {
             return new Response(
               JSON.stringify({
-                message: 'Auth session missing!',
-                error: 'missing_authorization_header',
+                data: { user: null, session: null },
+                error: null,
               }),
               {
-                status: 401,
+                status: 200,
                 headers: { 'Content-Type': 'application/json' },
               }
             );

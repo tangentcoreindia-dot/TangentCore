@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Sparkles, ArrowRight, CheckCircle2, Lock, Mail, Brain, Sun, Moon } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Lock, Mail, Brain, Sun, Moon, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { AiBackground } from '@/components/ui/ai-background';
 import { BrandLogo } from '@/components/ui/brand-logo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ export default function LoginPage() {
         const res = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, phone }),
         });
 
         const data = await res.json();
@@ -64,9 +65,11 @@ export default function LoginPage() {
         }
 
         // Store local session in localStorage and cookie
-        const sessionUser = { id: data.user?.id || 'usr_' + Date.now(), email };
+        const sessionUser = { id: data.user?.id || 'usr_' + Date.now(), email, phone };
         try {
           localStorage.setItem('tc_session_user', JSON.stringify(sessionUser));
+          localStorage.setItem('tangentcore_lead_email', email);
+          if (phone) localStorage.setItem('tangentcore_lead_phone', phone);
           document.cookie = `tc_session_user=${encodeURIComponent(JSON.stringify(sessionUser))}; path=/; max-age=2592000; SameSite=Lax`;
         } catch {}
 
@@ -83,11 +86,11 @@ export default function LoginPage() {
       } else {
         let loginSuccess = false;
         try {
-          const { error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
-          if (!error) {
+          if (!error && data?.user) {
             loginSuccess = true;
           }
         } catch {}
@@ -97,7 +100,7 @@ export default function LoginPage() {
           const authRes = await fetch('/api/auth/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, phone }),
           });
           const authData = await authRes.json();
           if (!authRes.ok) {
@@ -105,9 +108,11 @@ export default function LoginPage() {
           }
         }
 
-        const sessionUser = { id: 'usr_' + Date.now(), email };
+        const sessionUser = { id: 'usr_' + Date.now(), email, phone };
         try {
           localStorage.setItem('tc_session_user', JSON.stringify(sessionUser));
+          localStorage.setItem('tangentcore_lead_email', email);
+          if (phone) localStorage.setItem('tangentcore_lead_phone', phone);
           document.cookie = `tc_session_user=${encodeURIComponent(JSON.stringify(sessionUser))}; path=/; max-age=2592000; SameSite=Lax`;
         } catch {}
 
@@ -195,6 +200,22 @@ export default function LoginPage() {
                   placeholder="name@company.com"
                   className={`w-full ${isDark ? 'bg-[#121315] border-white/10 text-white placeholder-[#B7B7B5]/60 focus:border-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#181818] placeholder-[#5C5C5C]/60 focus:border-[#B87333]'} border rounded-2xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all`}
                   required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-mono font-bold ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} mb-1.5 uppercase tracking-wider`}>
+                Mobile / WhatsApp Number {isSignUp ? '(For WhatsApp Audit Reports)' : '(Optional)'}
+              </label>
+              <div className="relative">
+                <Phone className={`absolute left-3.5 top-3.5 h-4 w-4 ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}`} />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className={`w-full ${isDark ? 'bg-[#121315] border-white/10 text-white placeholder-[#B7B7B5]/60 focus:border-[#C7A15A]' : 'bg-[#F6F5F3] border-[#E5E3DF] text-[#181818] placeholder-[#5C5C5C]/60 focus:border-[#B87333]'} border rounded-2xl pl-10 pr-4 py-2.5 text-sm focus:outline-none transition-all`}
                 />
               </div>
             </div>

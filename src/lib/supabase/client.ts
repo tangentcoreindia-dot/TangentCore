@@ -14,15 +14,15 @@ export function createClient() {
           return await fetch(input, init);
         } catch (err) {
           // If Supabase host is unreachable / paused / offline (e.g. ENOTFOUND or Failed to fetch),
-          // return 401 unauthenticated session so GoTrue does NOT throw AuthRetryableFetchError
+          // return empty user/session response so GoTrue does NOT throw AuthRetryableFetchError
           // and does NOT trigger retry loops or console errors.
           return new Response(
             JSON.stringify({
-              message: 'Auth session missing!',
-              error: 'missing_authorization_header',
+              data: { user: null, session: null },
+              error: null,
             }),
             {
-              status: 401,
+              status: 200,
               headers: { 'Content-Type': 'application/json' },
             }
           );

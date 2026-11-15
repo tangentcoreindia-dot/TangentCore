@@ -210,12 +210,12 @@ export async function queryBedrock(
         max_gen_len: maxTokens,
         temperature,
       };
-    } else if (modelId.startsWith('anthropic.')) {
+    } else if (modelId.includes('anthropic.')) {
       invokeBody = {
         anthropic_version: 'bedrock-2023-05-31',
         max_tokens: maxTokens,
         temperature,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content: [{ type: 'text', text: prompt }] }],
       };
       if (systemInstruction) invokeBody.system = systemInstruction;
     } else {

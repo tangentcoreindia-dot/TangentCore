@@ -20,8 +20,6 @@ import { AiRadarSweep } from '@/components/dashboard/ai-radar-sweep';
 import { AuditChecklistView } from '@/components/dashboard/audit-checklist-view';
 import { SdkInstallModal } from '@/components/dashboard/sdk-install-modal';
 import { PrintableExecutiveReport } from '@/components/dashboard/printable-executive-report';
-import { LeadCaptureModal } from '@/components/dashboard/lead-capture-modal';
-import { LeadDeliveryBadge } from '@/components/dashboard/lead-delivery-badge';
 import {
   Brain, RefreshCw, LogOut, Globe, Sparkles, CheckCircle2,
   Search, Loader2, Sun, Moon, Layers, Target, Link2, Bot,
@@ -40,8 +38,7 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isSdkModalOpen, setIsSdkModalOpen] = useState(false);
 
-  // GEO Studio Lead Capture & Delivery State
-  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  // User Contact & Delivery State (Sourced from session/auth)
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
   const [leadPhone, setLeadPhone] = useState('');
@@ -60,22 +57,40 @@ export default function DashboardPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    // Populate session user email and phone from auth & localStorage
+    const syncSessionUser = (emailVal?: string, phoneVal?: string) => {
+      if (emailVal) {
+        setUserEmail(emailVal);
+        setLeadEmail(emailVal);
+      }
+      if (phoneVal) {
+        setLeadPhone(phoneVal);
+      }
+    };
+
     supabase.auth.getUser()
       .then(({ data }) => {
         if (data?.user) {
-          setUserEmail(data.user.email || 'User');
+          syncSessionUser(data.user.email || 'User', data.user.user_metadata?.phone);
         } else {
           try {
             const stored = localStorage.getItem('tc_session_user');
-            if (stored) setUserEmail(JSON.parse(stored).email || 'User');
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              syncSessionUser(parsed.email || 'User', parsed.phone);
+            }
           } catch {}
         }
       })
       .catch(() => {
         try {
           const stored = localStorage.getItem('tc_session_user');
-          if (stored) setUserEmail(JSON.parse(stored).email || 'User');
-          else setUserEmail('User');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            syncSessionUser(parsed.email || 'User', parsed.phone);
+          } else {
+            setUserEmail('User');
+          }
         } catch {
           setUserEmail('User');
         }
@@ -191,7 +206,7 @@ export default function DashboardPage() {
               setWhatsappDeliveryUrl(capData.whatsappUrl);
               setWhatsappDeliveryText(capData.whatsappText);
             }
-            toast.success('Executive audit delivered to your inbox and WhatsApp!');
+            toast.success('Executive audit generated! Ready to export or share.');
           }
         } catch (leadErr) {
           console.warn('Lead dispatch error:', leadErr);
@@ -208,40 +223,18 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLeadSubmitFromDashboard = (leadData: {
-    name: string;
-    email: string;
-    phone: string;
-    sendEmail: boolean;
-    sendWhatsapp: boolean;
-  }) => {
-    setLeadName(leadData.name);
-    setLeadEmail(leadData.email);
-    setLeadPhone(leadData.phone);
-    try {
-      localStorage.setItem('tangentcore_lead_name', leadData.name);
-      localStorage.setItem('tangentcore_lead_email', leadData.email);
-      localStorage.setItem('tangentcore_lead_phone', leadData.phone);
-    } catch {}
-    setIsLeadModalOpen(false);
-    handleRunAnalysisForDomain(targetDomainInput, targetBrandInput, leadData);
-  };
-
   const handleRunAnalysis = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!targetDomainInput) {
       toast.error('Please enter a website domain (e.g. stripe.com)');
       return;
     }
-    // If user has not yet entered their details for this session, pop up the GEO Studio modal
-    if (!leadEmail && !leadPhone) {
-      setIsLeadModalOpen(true);
-      return;
-    }
     await handleRunAnalysisForDomain(targetDomainInput, targetBrandInput, {
-      name: leadName,
-      email: leadEmail,
-      phone: leadPhone,
+      name: leadName || userEmail?.split('@')[0] || 'User',
+      email: leadEmail || userEmail || '',
+      phone: leadPhone || '',
+      sendEmail: true,
+      sendWhatsapp: true,
     });
   };
 
@@ -884,15 +877,6 @@ export default function DashboardPage() {
             <PrintableExecutiveReport auditData={activeAuditData} />
           </>
         )}
-
-        {/* GEO Studio Lead Capture Modal */}
-        <LeadCaptureModal
-          isOpen={isLeadModalOpen}
-          domain={targetDomainInput || 'your website'}
-          onClose={() => setIsLeadModalOpen(false)}
-          onSubmit={handleLeadSubmitFromDashboard}
-          isDark={isDark}
-        />
 
         <SdkInstallModal
           isOpen={isSdkModalOpen}

@@ -344,12 +344,13 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
 
           {/* Sweep Results Breakdown Table */}
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-2">
-            Tested Prompt Sweep Sample
+            Tested Buyer Query Prompts ({promptScans.length} Total Audited)
           </h3>
           <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
             <table className="w-full text-left">
               <thead className="bg-slate-100 border-b border-slate-300 font-black text-slate-800">
                 <tr>
+                  <th className="py-2.5 px-3">#</th>
                   <th className="py-2.5 px-3">Buyer Query Prompt</th>
                   <th className="py-2.5 px-3">Intent Category</th>
                   <th className="py-2.5 px-3">Brand Mentioned</th>
@@ -357,17 +358,18 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {promptScans.slice(0, 6).map((scan: any, sIdx: number) => (
-                  <tr key={sIdx} className="font-medium">
-                    <td className="py-2.5 px-3 font-semibold text-slate-900 max-w-[280px] truncate">
+                {promptScans.map((scan: any, sIdx: number) => (
+                  <tr key={sIdx} className="font-medium break-inside-avoid">
+                    <td className="py-2 px-3 font-mono text-slate-500 text-[11px]">{sIdx + 1}</td>
+                    <td className="py-2 px-3 font-semibold text-slate-900">
                       "{scan.promptText}"
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td className="py-2 px-3">
                       <span className="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-700">
                         {scan.category}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3">
+                    <td className="py-2 px-3">
                       {scan.shareOfVoice > 0 ? (
                         <span className="text-emerald-700 font-bold flex items-center gap-1">
                           <Check className="w-3.5 h-3.5" /> Cited
@@ -378,7 +380,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
                         </span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
+                    <td className="py-2 px-3 font-mono font-bold text-slate-900">
                       {scan.shareOfVoice}%
                     </td>
                   </tr>
@@ -406,7 +408,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
           </div>
 
           <div className="space-y-3 text-xs">
-            {(pageAudit.auditChecklist || []).slice(0, 7).map((item: any, idx: number) => (
+            {(pageAudit.auditChecklist || []).map((item: any, idx: number) => (
               <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 break-inside-avoid">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
@@ -569,7 +571,7 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {promptScans.slice(0, 8).map((scan: any, pIdx: number) => {
+              {promptScans.map((scan: any, pIdx: number) => {
                 const chatgpt = scan.modelResults?.find((m: any) => m.modelName?.includes('chatgpt'));
                 const gemini = scan.modelResults?.find((m: any) => m.modelName?.includes('gemini'));
                 const claude = scan.modelResults?.find((m: any) => m.modelName?.includes('claude'));
@@ -682,28 +684,31 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
           </p>
 
           <div className="space-y-4 text-xs">
-            {gaps.slice(0, 3).map((gap: any, gIdx: number) => (
-              <div key={gIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50 break-inside-avoid">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-black text-sm text-slate-900">"{gap.promptText}"</span>
-                  <span className="text-[11px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded border border-rose-200">
-                    Competitor Cited: {gap.competitorDomain}
-                  </span>
-                </div>
+            {gaps.map((gap: any, gIdx: number) => {
+              const queryText = gap.missingPrompt || gap.promptText || gap.prompt || 'Target Buyer Query';
+              return (
+                <div key={gIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50 break-inside-avoid">
+                  <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                    <span className="font-black text-sm text-slate-900">"{queryText}"</span>
+                    <span className="text-[11px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded border border-rose-200">
+                      Competitor Cited: {gap.competitorDomain || 'Industry Rival'}
+                    </span>
+                  </div>
 
-                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2 mt-2">
-                  <div className="font-bold text-slate-900">
-                    Suggested GEO Content Title: <span className="text-blue-700">{gap.suggestedContentBrief?.title}</span>
-                  </div>
-                  <div className="text-slate-600">
-                    <strong>Direct Answer Hook:</strong> {gap.suggestedContentBrief?.directAnswerSummary}
-                  </div>
-                  <div className="text-slate-600">
-                    <strong>Target Headings Outline:</strong> {gap.suggestedContentBrief?.suggestedHeadings?.slice(0, 4).join(' • ')}
+                  <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2 mt-2">
+                    <div className="font-bold text-slate-900">
+                      Suggested GEO Content Title: <span className="text-blue-700">{gap.suggestedContentBrief?.title}</span>
+                    </div>
+                    <div className="text-slate-600">
+                      <strong>Direct Answer Hook:</strong> {gap.suggestedContentBrief?.directAnswerSummary}
+                    </div>
+                    <div className="text-slate-600">
+                      <strong>Target Headings Outline:</strong> {gap.suggestedContentBrief?.suggestedHeadings?.slice(0, 5).join(' • ')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -729,14 +734,35 @@ export function PrintableExecutiveReport({ auditData }: PrintableExecutiveReport
           </p>
 
           <div className="space-y-2 text-xs mb-6">
-            {discoveredCitations.slice(0, 8).map((cite: string, cIdx: number) => (
-              <div key={cIdx} className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
-                <span className="font-mono text-slate-800 truncate max-w-[480px]">{cite}</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  Verified Citation
-                </span>
+            {discoveredCitations.length > 0 ? (
+              discoveredCitations.map((cite: string, cIdx: number) => (
+                <div key={cIdx} className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <span className="font-mono text-slate-800 truncate max-w-[480px]">{cite}</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Verified Citation
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {[
+                  { name: 'Wikidata & Knowledge Graph sameAs Links', type: 'Entity Signal', status: foundation.https?.secure ? 'Active Vector' : 'Pending' },
+                  { name: 'Google Knowledge Panel & Merchant Center', type: 'Brand Authority', status: 'Core Source' },
+                  { name: 'Industry Press & Media Feature Citations', type: 'External PR', status: 'Recommended Action' },
+                  { name: 'Verified Customer Review Platforms (Trustpilot / G2)', type: 'Trust Signal', status: 'Recommended Action' },
+                ].map((item, iIdx) => (
+                  <div key={iIdx} className="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-slate-900">{item.name}</div>
+                      <div className="text-[10px] text-slate-500">{item.type}</div>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200">
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
 
           {/* Audit Verification Statement */}

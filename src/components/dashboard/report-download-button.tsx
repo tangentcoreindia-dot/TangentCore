@@ -10,7 +10,10 @@ interface ReportDownloadButtonProps {
 
 export function ReportDownloadButton({ auditData, isDark = true }: ReportDownloadButtonProps) {
   const handlePrintPdf = () => {
-    window.print();
+    toast.info('Print Tip: Uncheck "Headers and footers" in your browser print settings for a clean white-label PDF.');
+    setTimeout(() => {
+      window.print();
+    }, 450);
   };
 
   const handleShareWhatsApp = () => {
