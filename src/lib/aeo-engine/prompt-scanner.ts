@@ -295,7 +295,7 @@ async function queryAIModel(
   brandAliases: string[] = []
 ): Promise<ModelScanResult> {
   try {
-    const CLAUDE_SONNET_MODEL = 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
+    const CLAUDE_SONNET_MODEL = 'global.anthropic.claude-sonnet-4-5-20250929-v1:0';
 
     const modelConfigMap: Record<string, { system: string; model: string }> = {
       claude: {
