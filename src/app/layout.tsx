@@ -25,11 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased bg-[#0B0B0C] text-[#F6F6F4] min-h-screen overflow-x-hidden w-full max-w-full" suppressHydrationWarning>
+    <html lang="en" className="light" suppressHydrationWarning>
+      <body className="antialiased bg-[#FCFCFB] text-[#181818] dark:bg-[#0B0B0C] dark:text-[#F6F6F4] min-h-screen overflow-x-hidden w-full max-w-full" suppressHydrationWarning>
         <ThemeProvider>
           {children}
-          <Toaster position="top-right" theme="dark" richColors />
+          <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>
     </html>

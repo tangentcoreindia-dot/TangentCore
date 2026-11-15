@@ -11,7 +11,7 @@ interface BrandLogoProps {
 }
 
 export function BrandLogo({
-  isDark = true,
+  isDark = false,
   size = 'md',
   subtitle = 'INTELLIGENT ROUTING ENGINE',
   className = '',

@@ -5,6 +5,11 @@
 @tailwind utilities;
 
 :root {
+  --background: #FCFCFB;
+  --foreground: #181818;
+}
+
+.dark {
   --background: #0B0B0C;
   --foreground: #F6F6F4;
 }

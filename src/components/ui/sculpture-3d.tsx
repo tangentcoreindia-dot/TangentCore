@@ -17,7 +17,7 @@ const AI_PLATFORMS = [
   { name: 'DeepSeek', short: 'DSK' },
 ];
 
-export function Sculpture3D({ isDark = true, className = '' }: Sculpture3DProps) {
+export function Sculpture3D({ isDark = false, className = '' }: Sculpture3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [activePlatforms, setActivePlatforms] = useState(4);
   const [isLoaded, setIsLoaded] = useState(false);

@@ -39,7 +39,7 @@ export function CheckoutModal({
   planId = 'growth',
   planPrice = '$149', 
   isAnnual, 
-  isDark = true 
+  isDark = false 
 }: CheckoutModalProps) {
   const plan = PRICING_PLANS[planId] || PRICING_PLANS.growth;
   const amountInRupees = isAnnual ? plan.annualAmountInr : plan.monthlyAmountInr;

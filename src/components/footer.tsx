@@ -9,7 +9,7 @@ interface FooterProps {
   isDark?: boolean;
 }
 
-export function Footer({ isDark = true }: FooterProps) {
+export function Footer({ isDark = false }: FooterProps) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -78,7 +78,7 @@ export function Footer({ isDark = true }: FooterProps) {
           <div className="lg:col-span-4 space-y-5">
             {/* Brand Logo & Venture Badge */}
             <div className="space-y-3">
-              <BrandLogo isDark={isDark || true} size="lg" subtitle="AI VISIBILITY INTELLIGENCE" />
+              <BrandLogo isDark={isDark} size="lg" subtitle="AI VISIBILITY INTELLIGENCE" />
               <a
                 href="https://scalezix.com"
                 target="_blank"
