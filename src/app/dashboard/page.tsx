@@ -60,11 +60,15 @@ export default function DashboardPage() {
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUserEmail(data.user.email || 'User');
-      }
-    });
+    supabase.auth.getUser()
+      .then(({ data }) => {
+        if (data?.user) {
+          setUserEmail(data.user.email || 'User');
+        }
+      })
+      .catch(() => {
+        setUserEmail('User');
+      });
 
     // Load cached audit and saved lead details from localStorage/sessionStorage
     if (typeof window !== 'undefined') {

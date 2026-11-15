@@ -461,7 +461,7 @@ Return ONLY valid JSON matching this schema:
     const parsed = await queryGeminiJSON(
       intelligencePrompt,
       'You are a senior AEO strategist and business intelligence analyst. Return strictly valid JSON.',
-      { model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0', temperature: 0.1, maxTokens: 2500 }
+      { model: 'global.anthropic.claude-sonnet-4-5-20250929-v1:0', temperature: 0.1, maxTokens: 2500 }
     );
 
     if (parsed) {
@@ -524,27 +524,31 @@ Return ONLY valid JSON matching this schema:
 
     aiKeywords = extractedWords.length > 0
       ? Array.from(new Set(extractedWords)).slice(0, 6)
-      : [aiBrandName, 'Enterprise Solutions', 'Digital Platform', 'Technology Services'];
+      : [aiBrandName || domain.split('.')[0]];
   }
 
-  // Intelligent Niche Fallback: If AI returned 0 competitors (e.g. sparse or regional vernacular content),
-  // infer commercial competitors from content context so user never sees 0 tracked competitors:
+  // Real Competitor Discovery via Claude on Bedrock
   if (aiCompetitors.length === 0) {
-    const combinedContext = `${domain} ${rawTitle} ${rawDescription} ${bodyExcerpt}`.toLowerCase();
-    
-    // Check vegan self-care, luxury bath, body, skincare first
-    if (/\b(skincare|body care|fragrance|bath|cosmetics?|self-?care|beauty|perfume|lotion|wellness)\b/i.test(combinedContext)) {
-      aiCompetitors = ['forestessentialsindia.com', 'thebodyshop.in', 'kamaayurveda.com', 'plumgoodness.com'];
-    } else if (/\b(jewel|jewellery|gold|diamond|silver|necklace|ring)\b/i.test(combinedContext)) {
-      aiCompetitors = ['bluestone.com', 'caratlane.com', 'tanishq.co.in', 'melorra.com'];
-    } else if (/\b(saree|lehenga|ethnic|kurti|apparel|fashion clothing)\b/i.test(combinedContext)) {
-      aiCompetitors = ['kalkifashion.com', 'manyavar.com', 'myntra.com', 'perniaspopupshop.com'];
-    } else if (/\b(billing|payment|invoice|checkout|gateway|fintech)\b/i.test(combinedContext)) {
-      aiCompetitors = ['stripe.com', 'razorpay.com', 'chargebee.com', 'cashfree.com'];
-    } else if (/\b(used cars?|new cars?|gadi|gaadi|automotive|vehicles?|trucks?|e-challan)\b/i.test(combinedContext) && !combinedContext.includes('skin') && !combinedContext.includes('care')) {
-      aiCompetitors = ['cardekho.com', 'carwale.com', 'spinny.com', 'cars24.com'];
-    } else if (userCompetitors && userCompetitors.length > 0) {
+    if (userCompetitors && userCompetitors.length > 0) {
       aiCompetitors = userCompetitors;
+    } else {
+      try {
+        const compParsed = await queryGeminiJSON<{ competitors: string[] }>(
+          `Name the top 4 real direct commercial market rivals and competitors for "${domain}" (${aiBrandName || domain}).
+Return strictly valid JSON:
+{
+  "competitors": ["competitor1.com", "competitor2.com", "competitor3.com", "competitor4.com"]
+}`,
+          'You are a competitive market intelligence analyst. Return real competitor domains in JSON without markdown codeblocks.'
+        );
+        if (compParsed?.competitors?.length) {
+          aiCompetitors = compParsed.competitors
+            .map((c: string) => String(c).toLowerCase().trim().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, ''))
+            .filter((c: string) => c && c !== domain && c.includes('.'));
+        }
+      } catch (compErr) {
+        console.warn('[Page Analyzer] Competitor discovery failed:', compErr);
+      }
     }
   }
 

@@ -47,15 +47,32 @@ Return JSON:
     }
 
     if (!titleTag) {
-      titleTag = `${brandName} — Official Platform | ${keyword}`;
-      metaDescription = `Discover ${brandName}. Leading solution for ${keyword}. Access products, services, and official updates on https://${input}.`;
-      openGraphTags = `<meta property="og:title" content="${titleTag}" />
-<meta property="og:description" content="${metaDescription}" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://${input}" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="${titleTag}" />
-<meta name="twitter:description" content="${metaDescription}" />`;
+      try {
+        const retryParsed = await queryGeminiJSON(
+          `Generate optimized SEO & AEO title tag (under 60 chars) and meta description (150-160 chars) for "${brandName}" targeting "${keyword}".
+Return JSON:
+{
+  "titleTag": "Optimized Title Tag",
+  "metaDescription": "Optimized Meta Description",
+  "openGraphTags": "<meta property=\\"og:title\\" content=\\"...\\" />\\n<meta property=\\"og:description\\" content=\\"...\\" />"
+}`,
+          'You are an SEO specialist. Return strictly JSON.'
+        );
+        if (retryParsed?.titleTag) {
+          titleTag = retryParsed.titleTag;
+          metaDescription = retryParsed.metaDescription || '';
+          openGraphTags = retryParsed.openGraphTags || '';
+        }
+      } catch (retryErr) {
+        console.warn('Meta opt retry failed:', retryErr);
+      }
+    }
+
+    if (!titleTag) {
+      return NextResponse.json(
+        { error: `Unable to synthesize meta tags for "${domainOrTopic}". Please verify your inputs and try again.` },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({

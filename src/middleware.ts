@@ -30,12 +30,34 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
+      global: {
+        fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+          try {
+            return await fetch(input, init);
+          } catch {
+            return new Response(
+              JSON.stringify({
+                message: 'Auth session missing!',
+                error: 'missing_authorization_header',
+              }),
+              {
+                status: 401,
+                headers: { 'Content-Type': 'application/json' },
+              }
+            );
+          }
+        },
+      },
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: any = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user ?? null;
+  } catch {
+    user = null;
+  }
 
   // Protect /dashboard routes
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {

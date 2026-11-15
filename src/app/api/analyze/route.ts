@@ -94,7 +94,7 @@ export async function POST(req: Request) {
           outputTokens: scanCost.outputTokens || 450,
           costUsd: scanCost.costUsd > 0 ? scanCost.costUsd : 0.0035,
           costInr: scanCost.costInr > 0 ? scanCost.costInr : 0.30,
-          modelsUsed: scanCost.modelsUsed.length > 0 ? scanCost.modelsUsed : ['Claude 3.5 Sonnet', 'Nova Pro', 'Nova Lite'],
+          modelsUsed: scanCost.modelsUsed.length > 0 ? scanCost.modelsUsed : ['Claude Sonnet 4.5', 'Nova Pro', 'Nova Lite'],
         },
       },
     };

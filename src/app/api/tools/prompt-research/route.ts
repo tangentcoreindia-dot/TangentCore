@@ -44,13 +44,32 @@ Return JSON:
     }
 
     if (prompts.length === 0) {
-      prompts = [
-        { id: 1, prompt: `What are the top offerings from ${brandName}?`, intent: 'High Buyer Intent', stage: 'Decision' },
-        { id: 2, prompt: `Top alternatives to ${brandName} for quality and value`, intent: 'Comparison Research', stage: 'Evaluation' },
-        { id: 3, prompt: `What is the price range and return policy of ${brandName}?`, intent: 'Pricing Research', stage: 'Consideration' },
-        { id: 4, prompt: `Are customer reviews positive for ${brandName}?`, intent: 'Proof & Trust', stage: 'Evaluation' },
-        { id: 5, prompt: `Where to buy official ${brandName} products online?`, intent: 'Navigational', stage: 'Decision' },
-      ];
+      try {
+        const retryParsed = await queryGeminiJSON(
+          `List 5 real questions enterprise buyers and consumers ask AI models (ChatGPT, Claude, Perplexity) when researching "${brandName}" (${input}).
+Return JSON:
+{
+  "prompts": [
+    {"id": 1, "prompt": "Prompt 1", "intent": "High Buyer Intent", "stage": "Decision"},
+    {"id": 2, "prompt": "Prompt 2", "intent": "Comparison", "stage": "Evaluation"},
+    {"id": 3, "prompt": "Prompt 3", "intent": "Pricing Research", "stage": "Consideration"},
+    {"id": 4, "prompt": "Prompt 4", "intent": "Reviews & Proof", "stage": "Evaluation"},
+    {"id": 5, "prompt": "Prompt 5", "intent": "Navigational", "stage": "Decision"}
+  ]
+}`,
+          'You are an AI search query researcher. Return real queries in JSON without markdown codeblocks.'
+        );
+        if (retryParsed?.prompts?.length) prompts = retryParsed.prompts;
+      } catch (retryErr) {
+        console.warn('Prompt research retry failed:', retryErr);
+      }
+    }
+
+    if (prompts.length === 0) {
+      return NextResponse.json(
+        { error: `Unable to discover buyer prompts for ${brandName}. Please try a more specific niche or company name.` },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         },
-        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
       });
 
       if (res.ok) {

@@ -16,7 +16,7 @@ const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 const DEFAULT_BEDROCK_REGION = process.env.BEDROCK_REGION || process.env.AWS_REGION || 'ap-south-1';
-const DEFAULT_BEDROCK_MODEL = process.env.BEDROCK_DEFAULT_MODEL || 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
+const DEFAULT_BEDROCK_MODEL = process.env.BEDROCK_DEFAULT_MODEL || 'global.anthropic.claude-sonnet-4-5-20250929-v1:0';
 
 export interface AIOptions {
   model?: string;
@@ -99,10 +99,8 @@ export function recordTokenUsage(modelId: string, inputTokens: number, outputTok
   activeSessionUsage.costUsd += callCostUsd;
   activeSessionUsage.costInr = activeSessionUsage.costUsd * 87.0;
 
-  const displayName = cleanModel.includes('claude-3-5')
-    ? 'Claude 3.5 Sonnet'
-    : cleanModel.includes('claude')
-    ? 'Claude 3 Haiku'
+  const displayName = cleanModel.includes('claude')
+    ? 'Claude Sonnet 4.5'
     : cleanModel.includes('nova-pro')
     ? 'Nova Pro'
     : cleanModel.includes('nova-lite')
@@ -132,20 +130,11 @@ export async function queryBedrock(
   const region = process.env.BEDROCK_REGION || process.env.AWS_REGION || DEFAULT_BEDROCK_REGION;
   let modelId = options.model || DEFAULT_BEDROCK_MODEL;
 
-  // Automatically upgrade legacy Claude 3.5 Sonnet v1 to current active Claude 3.5 Sonnet v2
-  if (modelId.includes('20240620-v1:0')) {
-    modelId = modelId.replace('20240620-v1:0', '20241022-v2:0');
-  }
-
-  // AWS Bedrock cross-region inference profile prefix handling
-  if (region.startsWith('ap-')) {
-    if (modelId.startsWith('amazon.nova') && !modelId.startsWith('apac.')) modelId = `apac.${modelId}`;
-    if (modelId.startsWith('anthropic.claude') && !modelId.startsWith('apac.')) modelId = `apac.${modelId}`;
-    if (modelId.startsWith('meta.llama') && !modelId.startsWith('apac.')) modelId = `apac.${modelId}`;
-  } else if (region.startsWith('us-')) {
-    if (modelId.startsWith('amazon.nova') && !modelId.startsWith('us.')) modelId = `us.${modelId}`;
-    if (modelId.startsWith('anthropic.claude') && !modelId.startsWith('us.')) modelId = `us.${modelId}`;
-    if (modelId.startsWith('meta.llama') && !modelId.startsWith('us.')) modelId = `us.${modelId}`;
+  // Route any Anthropic Claude request to the active global Claude Sonnet 4.5 inference profile
+  if (modelId.includes('claude')) {
+    modelId = 'global.anthropic.claude-sonnet-4-5-20250929-v1:0';
+  } else if (modelId.startsWith('amazon.nova') && !modelId.startsWith('apac.') && !modelId.startsWith('us.')) {
+    modelId = `apac.${modelId}`;
   }
 
   const temperature = options.temperature ?? 0.2;
@@ -189,23 +178,14 @@ export async function queryBedrock(
       const errText = await res.text().catch(() => '');
       console.warn(`[AWS Bedrock Converse API] ${modelId} (${region}) status ${res.status}: ${errText.slice(0, 300)}`);
       
-      // Automatic model failovers if access denied or unavailable in this region
-      if (res.status === 403 || res.status === 400 || res.status === 404) {
-        if (modelId.includes('20240620-v1:0')) {
-          console.warn(`[Bedrock Failover] Claude 3.5 Sonnet v1 is legacy. Upgrading to Sonnet v2...`);
-          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0' });
-        } else if (modelId.includes('claude-3-5')) {
-          console.warn(`[Bedrock Failover] Claude 3.5 Sonnet unavailable. Failing over to Amazon Nova Pro...`);
+      // Automatic model failover if access denied, rate limited, or model unavailable
+      if (res.status === 403 || res.status === 400 || res.status === 404 || res.status === 429) {
+        if (modelId.includes('claude')) {
+          console.warn(`[Bedrock Failover] Claude Sonnet 4.5 unavailable (${res.status}). Failing over to Amazon Nova Pro...`);
           return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.amazon.nova-pro-v1:0' });
-        } else if (modelId.includes('claude')) {
-          console.warn(`[Bedrock Failover] Claude unavailable. Failing over to Amazon Nova Pro...`);
-          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.amazon.nova-pro-v1:0' });
-        } else if (modelId.includes('llama')) {
-          console.warn(`[Bedrock Failover] Llama model unavailable in ${region}. Failing over to Claude 3.5 Sonnet v2...`);
-          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0' });
-        } else if (!modelId.includes('claude-3-5')) {
-          console.warn(`[Bedrock Failover] Model ${modelId} failed. Failing over to Claude 3.5 Sonnet v2...`);
-          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.anthropic.claude-3-5-sonnet-20241022-v2:0' });
+        } else if (modelId.includes('nova-pro')) {
+          console.warn(`[Bedrock Failover] Amazon Nova Pro unavailable. Failing over to Nova Lite...`);
+          return queryBedrock(prompt, systemInstruction, { ...options, model: 'apac.amazon.nova-lite-v1:0' });
         }
       }
     }
@@ -349,21 +329,19 @@ export async function queryGemini(
   const hasBedrockKey = !!(process.env.AWS_BEDROCK_API_KEY || process.env.BEDROCK_API_KEY);
   const hasGeminiKey = !!(process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes('placeholder'));
 
-  // If explicitly requested or if Bedrock is configured and Gemini is not
-  if (options.provider === 'bedrock' || (hasBedrockKey && !hasGeminiKey)) {
-    const res = await queryBedrock(prompt, systemInstruction, options);
+  // 1. Primary Engine: AWS Bedrock Claude Sonnet 4.5
+  if (hasBedrockKey) {
+    const res = await queryBedrock(prompt, systemInstruction, {
+      ...options,
+      model: options.model || 'global.anthropic.claude-sonnet-4-5-20250929-v1:0',
+    });
     if (res) return res;
   }
 
-  // If Gemini is available
+  // 2. Fallback Engine: Google Gemini Direct
   if (hasGeminiKey) {
     const res = await queryGeminiDirect(prompt, systemInstruction, options);
     if (res) return res;
-  }
-
-  // Fallback to Bedrock if Gemini failed or wasn't primary
-  if (hasBedrockKey) {
-    return queryBedrock(prompt, systemInstruction, options);
   }
 
   return '';

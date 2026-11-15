@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         },
-        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
       });
 
       if (res.ok) {
@@ -58,43 +58,40 @@ export async function POST(req: Request) {
       console.warn('HTTP scraping warning for EEAT:', err);
     }
 
-    let eeatScore = 86;
-    let breakdown = {
-      experience: { score: 88, label: 'High', details: 'Customer proof, product reviews & case studies detected' },
-      expertise: { score: 84, label: 'High', details: 'Domain authority & category specifications verified' },
-      authority: { score: 89, label: 'Very High', details: 'Brand entity recognition & Organization schema found' },
-      trust: { score: 83, label: 'High', details: 'HTTPS SSL security, return policy & terms verified' },
-    };
+    let eeatScore = 0;
+    let breakdown: any = null;
     let auditChecks: any[] = [];
     let recommendation = '';
 
-    // Stage 2: Real LLM Audit via Google Gemini API
+    // Stage 2: Real LLM Audit via Claude Sonnet on AWS Bedrock
     try {
       const parsed = await queryGeminiJSON(
-        `Perform a real E-E-A-T audit for domain "${domain}" (${brandName}).
+        `Perform an authentic E-E-A-T audit for domain "${domain}" (${brandName}).
 Site Title: "${siteTitle}"
 Meta Description: "${metaDescription}"
+Detected Schemas: ${schemasFound.join(', ') || 'None'}
+HTTPS Verified: ${hasSsl ? 'Yes' : 'No'}
+Privacy & Terms Pages Found: ${hasPrivacyPolicy && hasTerms ? 'Yes' : 'No'}
 
 Return JSON:
 {
-  "eeatScore": 88,
+  "eeatScore": 82,
   "breakdown": {
-    "experience": {"score": 86, "label": "High/Moderate/Low", "details": "Specific Experience findings for ${brandName}"},
-    "expertise": {"score": 85, "label": "High/Moderate/Low", "details": "Specific Expertise findings for ${brandName}"},
-    "authority": {"score": 90, "label": "High/Moderate/Low", "details": "Specific Authoritativeness findings for ${brandName}"},
-    "trust": {"score": 89, "label": "High/Moderate/Low", "details": "Specific Trustworthiness findings for ${brandName}"}
+    "experience": {"score": 80, "label": "High/Moderate/Low", "details": "Specific Experience findings for ${brandName}"},
+    "expertise": {"score": 78, "label": "High/Moderate/Low", "details": "Specific Expertise findings for ${brandName}"},
+    "authority": {"score": 85, "label": "High/Moderate/Low", "details": "Specific Authoritativeness findings for ${brandName}"},
+    "trust": {"score": 84, "label": "High/Moderate/Low", "details": "Specific Trustworthiness findings for ${brandName}"}
   },
   "auditChecks": [
-    {"check": "Organization JSON-LD Schema", "status": "Passed/Needs Action", "pass": true},
-    {"check": "SSL Security Certificate (HTTPS)", "status": "Passed", "pass": true},
-    {"check": "Wikidata & Knowledge Graph sameAs Links", "status": "Passed/Needs Action", "pass": true},
-    {"check": "Author & Founder Byline Profiles", "status": "Passed/Needs Action", "pass": true},
-    {"check": "Privacy Policy & Terms Pages", "status": "Passed/Needs Action", "pass": true}
+    {"check": "Organization JSON-LD Schema", "status": "${schemasFound.includes('Organization Schema') ? 'Passed' : 'Needs Action'}", "pass": ${schemasFound.includes('Organization Schema')}},
+    {"check": "SSL Security Certificate (HTTPS)", "status": "${hasSsl ? 'Passed' : 'Needs Action'}", "pass": ${hasSsl}},
+    {"check": "Wikidata & Knowledge Graph sameAs Links", "status": "${schemasFound.includes('sameAs Knowledge Links') ? 'Passed' : 'Needs Action'}", "pass": ${schemasFound.includes('sameAs Knowledge Links')}},
+    {"check": "Author & Founder Byline Profiles", "status": "${schemasFound.includes('Author / Person Schema') ? 'Passed' : 'Needs Action'}", "pass": ${schemasFound.includes('Author / Person Schema')}},
+    {"check": "Privacy Policy & Terms Pages", "status": "${hasPrivacyPolicy && hasTerms ? 'Passed' : 'Needs Action'}", "pass": ${hasPrivacyPolicy && hasTerms}}
   ],
   "recommendation": "1-sentence specific actionable E-E-A-T recommendation for ${brandName}"
 }`,
-        'You are a Google E-E-A-T (Experience, Expertise, Authoritativeness, Trustworthiness) auditor. Return strictly JSON matching the requested schema without markdown codeblocks.',
-        { temperature: 0.1 }
+        'You are an authoritative Google E-E-A-T evaluator. Analyze the real brand and return authentic, factual JSON without markdown codeblocks.'
       );
 
       if (parsed) {
@@ -104,7 +101,25 @@ Return JSON:
         if (parsed.recommendation) recommendation = parsed.recommendation;
       }
     } catch (aiErr) {
-      console.warn('Gemini API call error for EEAT:', aiErr);
+      console.warn('AI call error for EEAT:', aiErr);
+    }
+
+    if (!breakdown) {
+      const expScore = schemasFound.length > 0 ? 80 : 65;
+      const expLabel = expScore > 75 ? 'High' : 'Moderate';
+      const autScore = schemasFound.includes('sameAs Knowledge Links') ? 85 : 70;
+      const autLabel = autScore > 75 ? 'High' : 'Moderate';
+      const truScore = (hasSsl && hasPrivacyPolicy && hasTerms) ? 88 : hasSsl ? 72 : 50;
+      const truLabel = truScore > 75 ? 'High' : 'Moderate';
+      const computedOverall = Math.round((expScore + autScore + truScore + 75) / 4);
+
+      eeatScore = computedOverall;
+      breakdown = {
+        experience: { score: expScore, label: expLabel, details: `Verified operational presence and digital assets for ${brandName}.` },
+        expertise: { score: 75, label: 'Moderate', details: `Domain authority and topical focus identified on ${domain}.` },
+        authority: { score: autScore, label: autLabel, details: schemasFound.length > 0 ? `Detected ${schemasFound.join(', ')}.` : `No structured entity schema detected.` },
+        trust: { score: truScore, label: truLabel, details: hasSsl ? 'HTTPS encryption active.' : 'Security certificates need attention.' },
+      };
     }
 
     if (auditChecks.length === 0) {

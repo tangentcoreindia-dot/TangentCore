@@ -42,16 +42,22 @@ export default function BrandAuditorToolPage() {
         body: JSON.stringify({ domainInput: domainToAudit }),
       });
 
-      const json = await res.json();
-      if (res.ok && json.data) {
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch {
+        json = null;
+      }
+
+      if (res.ok && json?.data) {
         setAuditResult(json.data);
         toast.success(`Brand audit completed for ${json.data.domain}!`);
       } else {
-        toast.error(json.error || 'Failed to analyze domain');
+        toast.error(json?.error || 'Failed to analyze domain. Please try again.');
       }
     } catch (err) {
-      console.error(err);
-      toast.error('Network error during brand audit');
+      console.warn('Brand audit fetch error:', err);
+      toast.error('Connection to audit server timed out or failed. Please refresh and try again.');
     } finally {
       setLoading(false);
     }

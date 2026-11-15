@@ -7,5 +7,27 @@ export function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+        try {
+          return await fetch(input, init);
+        } catch (err) {
+          // If Supabase host is unreachable / paused / offline (e.g. ENOTFOUND or Failed to fetch),
+          // return 401 unauthenticated session so GoTrue does NOT throw AuthRetryableFetchError
+          // and does NOT trigger retry loops or console errors.
+          return new Response(
+            JSON.stringify({
+              message: 'Auth session missing!',
+              error: 'missing_authorization_header',
+            }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
+        }
+      },
+    },
+  });
 }

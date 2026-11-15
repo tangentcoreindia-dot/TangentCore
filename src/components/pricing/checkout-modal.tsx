@@ -7,7 +7,7 @@ import {
   ArrowRight, Building2, Mail, Globe, Phone, ExternalLink, RefreshCw 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { PRICING_PLANS } from '@/lib/razorpay';
+import { PRICING_PLANS } from '@/lib/pricing-plans';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -90,10 +90,15 @@ export function CheckoutModal({
         }),
       });
 
-      const orderData = await orderRes.json();
+      let orderData: any = null;
+      try {
+        orderData = await orderRes.json();
+      } catch {
+        orderData = null;
+      }
 
-      if (!orderRes.ok || !orderData.orderId) {
-        toast.error(orderData.error || 'Failed to create payment order. Please try again.');
+      if (!orderRes.ok || !orderData?.orderId) {
+        toast.error(orderData?.error || 'Failed to create payment order. Please try again.');
         setIsSubmitting(false);
         return;
       }
@@ -142,9 +147,14 @@ export function CheckoutModal({
               }),
             });
 
-            const verifyData = await verifyRes.json();
+            let verifyData: any = null;
+            try {
+              verifyData = await verifyRes.json();
+            } catch {
+              verifyData = null;
+            }
 
-            if (verifyRes.ok && verifyData.success) {
+            if (verifyRes.ok && verifyData?.success) {
               setPaymentSuccess({
                 paymentId: response.razorpay_payment_id,
                 orderId: response.razorpay_order_id,

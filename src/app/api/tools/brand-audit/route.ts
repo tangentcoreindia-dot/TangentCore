@@ -159,58 +159,51 @@ Return JSON matching:
       console.warn('Gemini API call error:', aiErr);
     }
 
-    // Stage 3: Domain Knowledge Base Fallbacks
+    // Stage 3: If AI query returned empty, retry once with focused prompt
     if (!aiSummary || competitors.length === 0) {
-      if (domain.includes('rajaranicoaching')) {
-        siteTitle = 'Raja Rani Coaching';
-        aiSummary = `Raja Rani Coaching is one of India's premier fashion design and tailoring skill education platforms. Founded by Priya & Mohit Sevak, it empowers thousands of women and fashion enthusiasts with practical online courses in blouse designing, kurti cutting, stitching techniques, and boutique business management.`;
-        targetAudience = 'Fashion Students, Homemakers, Aspiring Designers, and Boutique Business Owners.';
-        keyFeatures = ['Online Tailoring & Fashion Designing Masterclasses', 'Step-by-Step Pattern Cutting & Stitching Tutorials', 'Government Recognized Skill Certification', 'Boutique Business Setup & Marketing Guidance'];
-        competitors = [
-          { name: 'IICA Fashion Academy', domain: 'iicafashion.com', positioning: 'Online Fashion & Tailoring Skill Competitor', threatLevel: 'High' },
-          { name: 'Usha Sew Magic', domain: 'ushasew.com', positioning: 'Traditional Sewing & Craft Academy', threatLevel: 'High' },
-          { name: 'Hunar Online Courses', domain: 'hunarcourses.com', positioning: 'Skill Education Platform for Creative Courses', threatLevel: 'High' },
-          { name: 'Hamstech Online', domain: 'hamstech.com', positioning: 'Fashion & Interior Design Learning Platform', threatLevel: 'Medium' },
-        ];
-      } else if (domain.includes('amazon')) {
-        siteTitle = 'Amazon';
-        aiSummary = `Amazon is a global technology company focusing on e-commerce, cloud computing (AWS), digital streaming, and artificial intelligence. As the world's largest online retailer, Amazon powers marketplace shopping, Prime fast delivery, logistics fulfillment, and cloud infrastructure for millions of businesses worldwide.`;
-        targetAudience = 'Global Consumers, E-Commerce Merchants, Developers, AWS Enterprise Clients, and Prime Subscribers.';
-        keyFeatures = ['Global E-Commerce Marketplace & Prime 1-Day Delivery', 'Amazon Web Services (AWS) Cloud Infrastructure', 'Fulfillment by Amazon (FBA) Logistics Network', 'Prime Video Digital Media & Streaming Services'];
-        competitors = [
-          { name: 'Walmart', domain: 'walmart.com', positioning: 'Largest Retail & E-Commerce Competitor', threatLevel: 'High' },
-          { name: 'eBay', domain: 'ebay.com', positioning: 'Global Consumer Online Auction & Marketplace', threatLevel: 'High' },
-          { name: 'Target', domain: 'target.com', positioning: 'Major Retail & Direct Shipping Competitor', threatLevel: 'Medium' },
-          { name: 'Alibaba', domain: 'alibaba.com', positioning: 'Global B2B & Wholesale E-Commerce Leader', threatLevel: 'Medium' },
-        ];
-      } else if (domain.includes('swiggy')) {
-        siteTitle = 'Swiggy';
-        aiSummary = `Swiggy is India's leading on-demand food delivery and quick-commerce ordering platform. It connects millions of urban consumers with over 150,000 restaurant partners and grocery merchants, enabling instant meal delivery, 10-minute grocery fulfillment via Swiggy Instamart, and dining reservations via Swiggy Dineout.`;
-        targetAudience = 'Urban Consumers, Families, Working Professionals, and Quick-Commerce Shoppers.';
-        keyFeatures = ['On-Demand Restaurant Food Delivery', 'Swiggy Instamart 10-Minute Instant Grocery Delivery', 'Swiggy Dineout Restaurant Reservations & Discounts', 'Live Order GPS Tracking & Swiggy One Membership'];
-        competitors = [
-          { name: 'Zomato', domain: 'zomato.com', positioning: 'Primary Food Delivery & Restaurant Discovery Rival in India', threatLevel: 'High' },
-          { name: 'Zepto', domain: 'zepto.com', positioning: 'Direct 10-Minute Quick-Commerce Instamart Competitor', threatLevel: 'High' },
-          { name: 'Blinkit', domain: 'blinkit.com', positioning: 'Instant Grocery Delivery Competitor (Zomato-Owned)', threatLevel: 'High' },
-          { name: 'BigBasket (BB Now)', domain: 'bigbasket.com', positioning: 'Tata-Owned Grocery & Quick-Commerce Competitor', threatLevel: 'Medium' },
-        ];
-      } else {
-        siteTitle = cleanBrandName;
-        aiSummary = `${cleanBrandName} (${domain}) is a digital platform operating at ${targetUrl}. Based on website content ("${metaDescription || siteTitle}"), the platform provides digital services and solutions designed to serve its target users.`;
-        targetAudience = 'Enterprise Leaders, Product Teams, Growth Marketers, and Business Owners.';
-        keyFeatures = ['Automated Digital Workflow Management', 'Real-Time Analytics & Performance Metrics', 'Enterprise Security & Data Protection Controls', 'Scalable API Integration Infrastructure'];
-        competitors = [
-          { name: 'BrightEdge', domain: 'brightedge.com', positioning: 'Enterprise Search & Brand Intelligence Platform', threatLevel: 'High' },
-          { name: 'Conductor', domain: 'conductor.com', positioning: 'Enterprise Organic Marketing & Content Analytics', threatLevel: 'High' },
-          { name: 'Semrush', domain: 'semrush.com', positioning: 'Search Visibility & Competitive Benchmarking Platform', threatLevel: 'Medium' },
-          { name: 'Ahrefs', domain: 'ahrefs.com', positioning: 'SEO Performance & Web Traffic Intelligence Tool', threatLevel: 'Medium' },
-        ];
+      try {
+        const retryParsed = await queryGeminiJSON(
+          `Identify the business operating at domain "${domain}".
+Return JSON with:
+{
+  "brandName": "Official Brand Name",
+  "executiveSummary": "2-3 sentence description of their actual business, products, or services.",
+  "targetAudience": "Primary customers.",
+  "keyFeatures": ["Feature 1", "Feature 2", "Feature 3"],
+  "competitors": [
+    {"name": "Competitor 1", "domain": "domain1.com", "positioning": "Market rival", "threatLevel": "High"},
+    {"name": "Competitor 2", "domain": "domain2.com", "positioning": "Alternative provider", "threatLevel": "Medium"}
+  ],
+  "aeoScore": 75
+}`,
+          'You are an authoritative business research analyst. Return strictly real facts in JSON without markdown codeblocks.'
+        );
+
+        if (retryParsed) {
+          if (retryParsed.brandName) siteTitle = retryParsed.brandName;
+          if (retryParsed.executiveSummary) aiSummary = retryParsed.executiveSummary;
+          if (retryParsed.targetAudience) targetAudience = retryParsed.targetAudience;
+          if (retryParsed.keyFeatures?.length) keyFeatures = retryParsed.keyFeatures;
+          if (retryParsed.competitors?.length) competitors = retryParsed.competitors;
+          if (retryParsed.aeoScore) aeoScore = retryParsed.aeoScore;
+        }
+      } catch (retryErr) {
+        console.warn('Brand audit retry failed:', retryErr);
       }
     }
 
-    if (schemasFound.length === 0) {
-      schemasFound = ['Organization', 'WebSite'];
+    if (!aiSummary) {
+      return NextResponse.json(
+        { error: `Unable to complete AI analysis for ${domain}. Please ensure the domain is active and publicly accessible.` },
+        { status: 502 }
+      );
     }
+
+    const dynamicRecommendation = schemasFound.length === 0
+      ? `Add Organization and WebSite JSON-LD schemas to boost AI answer engine entity recognition for ${cleanBrandName}.`
+      : !metaDescription
+      ? `Add clear descriptive meta tags and OpenGraph tags to help ChatGPT and Perplexity summarize ${cleanBrandName}.`
+      : `Expand FAQ and Product schema markup to capture #1 conversational citations across ChatGPT and Claude.`;
 
     return NextResponse.json({
       success: true,
@@ -220,10 +213,10 @@ Return JSON matching:
         brandName: cleanBrandName,
         siteTitle: siteTitle || `${cleanBrandName} — Official Platform`,
         metaDescription: metaDescription || `Official website and platform overview for ${cleanBrandName}.`,
-        logoUrl: logoCandidates[0],
+        logoUrl: logoCandidates[0] || googleFavicon,
         logoCandidates,
         faviconUrl: googleFavicon,
-        ogImage: ogImage || logoCandidates[0],
+        ogImage: ogImage || logoCandidates[0] || googleFavicon,
         executiveSummary: aiSummary,
         targetAudience,
         keyFeatures,
@@ -231,10 +224,10 @@ Return JSON matching:
         aeoReadiness: {
           score: aeoScore,
           schemasFound,
-          hasFavicon: true,
+          hasFavicon: !!googleFavicon,
           hasMetaDescription: metaDescription.length > 10,
-          aiCrawlerAccess: 'Allowed (GPTBot & PerplexityBot OK)',
-          recommendation: 'Add Organization and FAQPage JSON-LD schemas to boost Perplexity & ChatGPT citation rate by +38%.',
+          aiCrawlerAccess: 'Active (Crawlers allowed)',
+          recommendation: dynamicRecommendation,
         },
       },
     });

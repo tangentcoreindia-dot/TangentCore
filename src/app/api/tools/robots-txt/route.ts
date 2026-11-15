@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     try {
       const res = await fetch(robotsUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
-        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(8000),
       });
 
       if (res.ok) {

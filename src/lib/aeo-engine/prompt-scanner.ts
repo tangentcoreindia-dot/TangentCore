@@ -184,10 +184,11 @@ function generateFallbackPrompts(domain: string, brand: string, keywords: string
     .map(k => k.replace(/[^a-zA-Z0-9\s]/g, '').trim())
     .filter(k => k.length > 2 && k.split(/\s+/).length <= 4 && !k.toLowerCase().includes('http'));
 
-  const k1 = cleanK[0] || 'AI Automation';
-  const k2 = cleanK[1] || 'Custom Software Development';
-  const k3 = cleanK[2] || 'Enterprise AI Solutions';
-  const k4 = cleanK[3] || 'Workflow Optimization';
+  const baseTopic = (brand || domain.split('.')[0]).replace(/[^a-zA-Z0-9\s]/g, '').trim();
+  const k1 = cleanK[0] || `${baseTopic} offerings`;
+  const k2 = cleanK[1] || `${baseTopic} alternatives`;
+  const k3 = cleanK[2] || `${baseTopic} reviews`;
+  const k4 = cleanK[3] || `${baseTopic} features`;
 
   const masterPromptsList: Array<{ text: string; category: string }> = [
     { text: `best ${k1.toLowerCase()} services for growing business`, category: 'Competitor' },

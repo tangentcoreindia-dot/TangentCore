@@ -44,28 +44,32 @@ Return JSON:
     }
 
     if (faqs.length === 0) {
-      faqs = [
-        {
-          question: `What is ${brandName} and how does it work?`,
-          answer: `${brandName} is a platform providing specialized products and services tailored for its user community.`,
-        },
-        {
-          question: `How can I order or get started with ${brandName}?`,
-          answer: `You can explore products and place orders directly on the official ${brandName} website at https://${input}.`,
-        },
-        {
-          question: `Why choose ${brandName} over alternative options?`,
-          answer: `${brandName} focuses on product quality, customer support, and seamless online user experiences.`,
-        },
-        {
-          question: `Does ${brandName} provide customer support?`,
-          answer: `Yes, ${brandName} offers dedicated customer support, help documentation, and order assistance online.`,
-        },
-        {
-          question: `How does ${brandName} handle shipping and returns?`,
-          answer: `${brandName} adheres to transparent shipping, delivery tracking, and return policies.`,
-        },
-      ];
+      try {
+        const retryParsed = await queryGeminiJSON(
+          `Generate 5 real conversational Q&A frequently asked questions regarding "${brandName}" (${input}).
+Output JSON:
+{
+  "faqs": [
+    {"question": "Real Question 1", "answer": "Real Answer 1"},
+    {"question": "Real Question 2", "answer": "Real Answer 2"},
+    {"question": "Real Question 3", "answer": "Real Answer 3"},
+    {"question": "Real Question 4", "answer": "Real Answer 4"},
+    {"question": "Real Question 5", "answer": "Real Answer 5"}
+  ]
+}`,
+          'You are an authoritative FAQ creator. Return real, helpful answers strictly in JSON.'
+        );
+        if (retryParsed?.faqs?.length) faqs = retryParsed.faqs;
+      } catch (retryErr) {
+        console.warn('FAQ retry failed:', retryErr);
+      }
+    }
+
+    if (faqs.length === 0) {
+      return NextResponse.json(
+        { error: `Unable to generate conversational FAQs for ${brandName}. Please verify the topic or domain and try again.` },
+        { status: 502 }
+      );
     }
 
     const jsonLdSchema = {

@@ -23,24 +23,28 @@ export function BrandLogo({
       title: 'text-lg',
       sub: 'text-[6px] tracking-[0.2em]',
       gap: 'gap-2.5',
+      height: 28,
     },
     md: {
       img: 'h-8 sm:h-10 w-auto',
       title: 'text-lg sm:text-2xl',
       sub: 'text-[7.5px] sm:text-[8.5px] tracking-[0.22em]',
       gap: 'gap-2 sm:gap-3',
+      height: 40,
     },
     lg: {
       img: 'h-12 sm:h-14 w-auto',
       title: 'text-2xl sm:text-3xl',
       sub: 'text-[8.5px] sm:text-[9.5px] tracking-[0.24em]',
       gap: 'gap-3.5 sm:gap-4',
+      height: 56,
     },
     xl: {
       img: 'h-16 sm:h-20 w-auto',
       title: 'text-3xl sm:text-4xl',
       sub: 'text-[10px] sm:text-[11px] tracking-[0.26em]',
       gap: 'gap-4 sm:gap-5',
+      height: 80,
     },
   }[size];
 
@@ -50,6 +54,15 @@ export function BrandLogo({
       <img
         src="/logo.png"
         alt="TangentCore Logo"
+        height={dimensions.height}
+        style={{
+          maxHeight: `${dimensions.height}px`,
+          maxWidth: '180px',
+          height: 'auto',
+          width: 'auto',
+          objectFit: 'contain',
+          display: 'inline-block',
+        }}
         className={`${dimensions.img} object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-md`}
       />
 
