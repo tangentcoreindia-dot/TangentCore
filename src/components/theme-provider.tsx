@@ -15,20 +15,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Read saved theme from localStorage on initial load
-    const savedTheme = localStorage.getItem('tangentcore-theme');
-    if (savedTheme !== null) {
-      const dark = savedTheme === 'dark';
-      setIsDark(dark);
-      if (dark) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-      }
+    // Clean up any legacy dark mode preference stored previously
+    try {
+      localStorage.removeItem('tangentcore-theme');
+    } catch {}
+
+    const userPref = typeof window !== 'undefined' ? localStorage.getItem('tc-theme-pref') : null;
+    if (userPref === 'dark') {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     } else {
-      // Default to light mode on first visit
+      // Default to light mode
       setIsDark(false);
       document.documentElement.classList.remove('dark');
       document.documentElement.classList.add('light');
@@ -36,20 +34,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    localStorage.setItem('tangentcore-theme', isDark ? 'dark' : 'light');
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    }
-  }, [isDark, mounted]);
-
   const toggleTheme = () => {
-    setIsDark((prev) => !prev);
+    setIsDark((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('tc-theme-pref', next ? 'dark' : 'light');
+      } catch {}
+      if (next) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+      return next;
+    });
   };
 
   return (
