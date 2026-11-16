@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   ShieldCheck, Lock, Mail, Globe, CheckCircle2, ArrowRight, 
@@ -8,12 +8,12 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
 import { AiBackground } from '@/components/ui/ai-background';
 
 export default function PrivacyPage() {
   const { isDark } = useTheme();
   const [activeSection, setActiveSection] = useState('sec-1');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const sections = [
     { id: 'sec-1', number: '01', title: 'Introduction' },
@@ -32,6 +32,52 @@ export default function PrivacyPage() {
     { id: 'sec-14', number: '14', title: 'Changes to This Policy' },
     { id: 'sec-15', number: '15', title: 'Contact Information' },
   ];
+
+  // Auto-highlight sidebar as user scrolls through each section level
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      // If user is near the bottom of the container, highlight the final section
+      if (container.scrollHeight - container.scrollTop <= container.clientHeight + 80) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
+      }
+
+      const containerRect = container.getBoundingClientRect();
+      const triggerPoint = containerRect.top + 160;
+
+      let currentId = sections[0].id;
+
+      for (let i = 0; i < sections.length; i++) {
+        const el = document.getElementById(sections[i].id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= triggerPoint) {
+            currentId = sections[i].id;
+          }
+        }
+      }
+
+      setActiveSection(currentId);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Keep the active section visible inside the sidebar nav
+  useEffect(() => {
+    const activeBtn = document.getElementById(`nav-${activeSection}`);
+    if (activeBtn) {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [activeSection]);
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
@@ -52,17 +98,17 @@ export default function PrivacyPage() {
       <div className="flex-1 flex overflow-hidden w-full relative z-10">
         
         {/* ================= FIXED LEFT SIDEBAR (NEVER MOVES, FULL HEIGHT, ZERO EMPTY SPACE) ================= */}
-        <aside className={`hidden lg:flex w-80 xl:w-96 shrink-0 h-full border-r ${
+        <aside className={`hidden lg:flex w-80 xl:w-88 shrink-0 h-full border-r ${
           isDark 
             ? 'bg-[#0E0F12] border-white/10 text-white' 
             : 'bg-[#F9F9F7] border-[#E5E3DF] text-[#181818]'
-        } flex-col justify-between p-6 z-20 shadow-lg`}>
+        } flex-col justify-between p-5 xl:p-6 z-20 shadow-lg select-none`}>
           
-          <div className="space-y-4">
+          <div className="space-y-3 flex-1 flex flex-col min-h-0">
             {/* Sidebar Title */}
-            <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-white/10">
+            <div className="flex items-center justify-between border-b pb-2.5 border-slate-200 dark:border-white/10 shrink-0">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-[#C7A15A]" />
+                <ShieldCheck className="w-4 h-4 text-[#C7A15A]" />
                 <h3 className={`text-xs font-mono uppercase font-black tracking-wider ${isDark ? 'text-[#C7A15A]' : 'text-[#B87333]'}`}>
                   Privacy Sections
                 </h3>
@@ -70,19 +116,20 @@ export default function PrivacyPage() {
               <span className="text-[11px] font-mono text-zinc-400">15 Articles</span>
             </div>
 
-            {/* 15 Section Links (Fixed in place, cleanly fitted without awkward scrollbar) */}
-            <nav className="space-y-1">
+            {/* 15 Section Links (Highlights automatically as you scroll to each level) */}
+            <nav className="space-y-0.5 flex-1 overflow-y-auto pr-1">
               {sections.map((sec) => {
                 const isActive = activeSection === sec.id;
                 return (
                   <button
                     key={sec.id}
+                    id={`nav-${sec.id}`}
                     onClick={() => scrollToSection(sec.id)}
                     className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-left transition-all text-xs xl:text-sm font-medium ${
                       isActive
                         ? isDark
-                          ? 'bg-[#C7A15A]/15 text-[#C7A15A] font-bold border border-[#C7A15A]/30'
-                          : 'bg-[#B87333]/10 text-[#B87333] font-bold border border-[#B87333]/20'
+                          ? 'bg-[#C7A15A]/20 text-[#C7A15A] font-bold border border-[#C7A15A]/40 shadow-sm'
+                          : 'bg-[#B87333]/15 text-[#B87333] font-bold border border-[#B87333]/30 shadow-sm'
                         : isDark
                         ? 'text-zinc-400 hover:text-white hover:bg-white/5'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
@@ -94,35 +141,32 @@ export default function PrivacyPage() {
                       </span>
                       <span className="truncate">{sec.title}</span>
                     </div>
-                    {isActive && <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
+                    {isActive && <ChevronRight className="w-3.5 h-3.5 shrink-0 animate-pulse text-[#C7A15A]" />}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Bottom Docked Office Details (Fixed at bottom of sidebar) */}
-          <div className={`p-4 rounded-2xl border text-xs font-mono space-y-2 mt-4 ${
-            isDark ? 'bg-white/5 border-white/10' : 'bg-white border-[#E5E3DF] shadow-xs'
+          {/* Docked Sleek Contact Footer (Compact, Fits Cleanly on Screen) */}
+          <div className={`pt-3 border-t border-slate-200 dark:border-white/10 shrink-0 text-xs font-mono flex items-center justify-between ${
+            isDark ? 'text-zinc-400' : 'text-slate-500'
           }`}>
-            <div className="flex items-center gap-1.5 text-[#C7A15A] font-bold uppercase text-[11px]">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Registered Office</span>
-            </div>
-            <p className={`text-[11px] leading-relaxed ${isDark ? 'text-zinc-300' : 'text-slate-600'}`}>
-              Plot No. 60, Ground Floor, Rameshwar Nagar, sr 80, Gandhidham, Kachchh, Gujarat – 370205, India
-            </p>
-            <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
-              <span className="text-[10px] text-zinc-400">Support:</span>
-              <a href="mailto:tangentcoreindia@gmail.com" className="text-[11px] text-[#C7A15A] font-bold hover:underline">
-                tangentcoreindia@gmail.com
-              </a>
-            </div>
+            <span>Support:</span>
+            <a 
+              href="mailto:tangentcoreindia@gmail.com" 
+              className="text-[#C7A15A] font-bold hover:underline inline-flex items-center gap-1 text-[11px]"
+            >
+              <Mail className="w-3 h-3" /> tangentcoreindia@gmail.com
+            </a>
           </div>
         </aside>
 
         {/* ================= RIGHT SCROLLABLE CONTENT AREA (ONLY THIS AREA SCROLLS) ================= */}
-        <div className="flex-1 h-full overflow-y-auto scroll-smooth flex flex-col justify-between">
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 h-full overflow-y-auto scroll-smooth"
+        >
           <div className="max-w-4xl w-full mx-auto px-6 sm:px-12 lg:px-16 py-12 sm:py-16 space-y-12">
             
             {/* Document Header */}
@@ -646,18 +690,15 @@ export default function PrivacyPage() {
                   </div>
                 </div>
 
-                <div className={`p-6 rounded-2xl border text-center text-base font-medium ${
-                  isDark ? 'bg-white/5 border-white/10 text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-800'
+                <div className={`p-6 rounded-2xl border text-center text-sm sm:text-base font-medium ${
+                  isDark ? 'bg-white/5 border-white/10 text-zinc-400' : 'bg-slate-100 border-slate-300 text-slate-600'
                 }`}>
-                  By using Tangentcore's services, you acknowledge that you have read and understood this Privacy Policy.
+                  © {new Date().getFullYear()} Tangentcore. By using Tangentcore's services, you acknowledge that you have read and understood this Privacy Policy.
                 </div>
               </section>
 
             </div>
           </div>
-
-          {/* Embedded Footer inside the scrollable document */}
-          <Footer isDark={isDark} />
         </div>
 
       </div>
