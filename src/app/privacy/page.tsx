@@ -559,7 +559,7 @@ export default function PrivacyPage() {
                 For questions, requests, or concerns regarding this Privacy Policy or our data handling practices, please contact:
               </p>
 
-              <div className={`p-6 rounded-2xl border space-y-3 text-xs font-mono ${
+              <div className={`p-6 rounded-2xl border space-y-3.5 text-xs font-mono ${
                 isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="flex items-center gap-2">
@@ -570,8 +570,8 @@ export default function PrivacyPage() {
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-[#C7A15A]" />
                   <span className="text-white dark:text-white font-bold">Website:</span>
-                  <a href="https://tangentcore.in" target="_blank" rel="noopener noreferrer" className="text-[#C7A15A] hover:underline">
-                    https://tangentcore.in
+                  <a href="https://tangentcore.in/" target="_blank" rel="noopener noreferrer" className="text-[#C7A15A] hover:underline">
+                    https://tangentcore.in/
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
@@ -581,10 +581,14 @@ export default function PrivacyPage() {
                     tangentcoreindia@gmail.com
                   </a>
                 </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#C7A15A]" />
-                  <span className="text-white dark:text-white font-bold">Registered Business Address:</span>
-                  <span>Tangentcore, India</span>
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-[#C7A15A] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-white dark:text-white font-bold block mb-0.5">Registered Business Address:</span>
+                    <span className="leading-relaxed">
+                      Plot No. 60, Ground Floor, Rameshwar Nagar, sr 80, Gandhidham, Kachchh, Gujarat – 370205, India
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-[#C7A15A]" />

@@ -71,9 +71,16 @@ export default function TermsPage() {
             <p className={isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'}>
               Services are provided on an "as is" basis. TangentCore shall not be liable for any indirect or consequential damages. These Terms are governed by the laws of <strong>India</strong> under the exclusive jurisdiction of courts located in India.
             </p>
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-mono">
-              <span className="text-[#C7A15A] font-bold block">Legal Team Contact:</span>
-              <a href="mailto:tangentcoreindia@gmail.com" className="text-white hover:underline">tangentcoreindia@gmail.com</a>
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 text-xs font-mono space-y-2">
+              <span className="text-[#C7A15A] font-bold block">Tangentcore Legal & Compliance:</span>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-bold">Email:</span>
+                <a href="mailto:tangentcoreindia@gmail.com" className="text-[#C7A15A] hover:underline">tangentcoreindia@gmail.com</a>
+              </div>
+              <div className="text-[11px] text-zinc-300 dark:text-zinc-400">
+                <span className="text-white font-bold block mb-0.5">Registered Office:</span>
+                Plot No. 60, Ground Floor, Rameshwar Nagar, sr 80, Gandhidham, Kachchh, Gujarat – 370205, India
+              </div>
             </div>
           </section>
 

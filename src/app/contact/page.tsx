@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  Mail, Phone, Clock, Send, CheckCircle2, Building2, HelpCircle, ShieldCheck, ArrowRight 
+  Mail, Phone, Clock, Send, CheckCircle2, Building2, HelpCircle, ShieldCheck, ArrowRight, MapPin 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from '@/components/theme-provider';
@@ -225,6 +225,16 @@ export default function ContactPage() {
                 <span className="text-white font-bold">Sunday</span>
                 <span className="text-rose-400">Closed</span>
               </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/10 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#C7A15A] uppercase">
+                <MapPin className="w-4 h-4" />
+                <span>Registered Office</span>
+              </div>
+              <p className={`text-xs ${isDark ? 'text-[#B7B7B5]' : 'text-[#5C5C5C]'} leading-relaxed`}>
+                Plot No. 60, Ground Floor, Rameshwar Nagar, sr 80, Gandhidham, Kachchh, Gujarat – 370205, India
+              </p>
             </div>
 
             <div className="pt-4 border-t border-white/10 space-y-2">
